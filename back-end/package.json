@@ -1,0 +1,34 @@
+{
+  "name": "back-end",
+  "version": "1.0.0",
+  "description": "back end of the groupomania website",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zeteo-xulon/Dreux_Nicolas_P7_21112021.git"
+  },
+  "keywords": [
+    "groupomania",
+    "social",
+    "media"
+  ],
+  "author": "zeteo_xulon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zeteo-xulon/Dreux_Nicolas_P7_21112021/issues"
+  },
+  "homepage": "https://github.com/zeteo-xulon/Dreux_Nicolas_P7_21112021#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "fs": "^0.0.1-security",
+    "mysql2": "^2.3.3",
+    "node": "^17.1.0",
+    "nodemon": "^2.0.15",
+    "path": "^0.12.7",
+    "sequelize": "^6.12.0-alpha.1",
+    "sequelize-cli": "^6.3.0"
+  }
+}
