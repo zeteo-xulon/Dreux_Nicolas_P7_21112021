@@ -34,4 +34,33 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+
+/*==========================================
+*             TABLES MODELES
+==========================================*/
+db.user = require("./User")(sequelize, Sequelize);
+db.post = require("./Post")(sequelize, Sequelize);
+db.comment = require("./Comment")(sequelize, Sequelize);
+db.role = require("./Role")(sequelize, Sequelize);
+
+/*==========================================
+*             TABLES JOIN
+==========================================*/
+//user
+db.user.hasMany(db.post, {foreignKey: "creator_id", onDelete: "CASCADE"})
+db.user.hasMany(db.comment, {foreignKey: "creator_id", onDelete: "CASCADE"})
+
+//role
+db.user.hasOne(db.role);
+db.role.belongsTo(db.user, { foreignKey: "role_id", onDelete:"NO ACTION", setDefault: 1 });
+
+//post
+db.post.hasMany(db.comment, { foreignKey: "comments_id", onDelete: "CASCADE" });
+
+db.post.belongsTo(db.user);
+//comment
+db.comments.belongsTo(db.post, { foreignKey: "post_id", onDelete:"NO ACTION" });
+db.comments.belongsTo(db.user);
+
+
 module.exports = db;
