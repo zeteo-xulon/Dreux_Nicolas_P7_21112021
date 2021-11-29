@@ -6,11 +6,9 @@ const jwt = require('jsonwebtoken');
 const passwordSchema = require("../middlewares/password");
 const db = require("../models");
 const User = db.user;
-
 /*----------------------------------------------------------------
 													CONTROLLER
 ----------------------------------------------------------------*/
-
 //	(1) Check the password requirement, (2) crypt it, (3) and save the user.
 exports.signup = (req, res, next) => {
 	let passwordIsClear = passwordSchema.validate(req.body.password);
@@ -29,21 +27,13 @@ exports.signup = (req, res, next) => {
 
 // Find the user in database, compare the password using bcrypt
 exports.login = (req, res, next) => {
-	User.findOne({ where: { 
-		email: req.body.email 
-		}})
+	User.findOne({ where: { email: req.body.email }})
 		.then((user) => {	
-			if (!user) { return res.status(401).json({ error: "User not found !" })}
+			if (!user) { return res.status(401).json({ error: "User not found !" })};
 			bcrypt.compare(req.body.password, user.password)
 				.then((valid) => {
 					if (!valid) { return res.status(401).json({ error: "Mot de passe incorrect !" }) };
-					res.status(200).json({ 
-						id: user.id, 
-						token: jwt.sign({ 
-							userId: user._id }, 
-							process.env.TOKEN, 
-							{ expiresIn: '24h' }
-						)	
+					res.status(200).json({ id: user.id, token: jwt.sign({	userId: user.id }, process.env.TOKEN, { expiresIn: '24h' })	
 					});
 				})
 				.catch((error) => res.status(500).json({ error }));
@@ -51,51 +41,61 @@ exports.login = (req, res, next) => {
 		.catch((error) => res.status(500).json({ error }));
 };
 
-
 // UPDATE user
 exports.update = (req, res, next) => {
+
+	//CUT
 	if(!req.body.token) { return res.status(400).json({ error: "Vous n'êtes pas authentifié" }, { err })};
 	if(req.body.token) {
 		let verified = jwt.verify(req.body.token, process.env.TOKEN);
 		console.log(verified);
 		if(!verified) { return res.status(400).json({ error: "TOKEN invalid" }, { err })
 	} else {
+		//STOP
+
 		if(req.body.password){
 			let passwordIsClear = passwordSchema.validate(req.body.password);
 			if(!passwordIsClear) { return res.status(400).json({ error: "Le mot de passe est incorrect" }, { err })};
 			if(passwordIsClear){
 			User.findOne({ where: { id: req.body.id }})
 			.then((user) => {
-				bcrypt.compare(req.body.password, user.password)
-				.then((valid) => {
-					if(!valid) { return res.status(401).json({ error: "Mot de passe incorrect !" }) };
-						bcrypt.hash(req.body.password, 10)
-						.then((hash) => {
-							User.update({ password: hash }, { where: { id: req.body.id }})
-							.then(() => res.status(201).json({ message: "Utilisateur modifié."}))
-							.catch(err => res.status(403).json({ error: "L'utilisateur n'as pas peu être modifié"}, { err }));
-						})
-						.catch((error) => res.status(500).json({ error }));
+					bcrypt.compare(req.body.oldpassword, user.password)
+					.then((valid) => {
+						if(!valid) { return res.status(401).json({ error: "Les mots de passe ne correspondent pas." }) };
+							bcrypt.hash(req.body.password, 10)
+							.then((hash) => {
+								User.update({ password: hash }, { where: { id: req.body.id }})
+								.then(() => res.status(201).json({ message: "Utilisateur modifié."}))
+								.catch(err => res.status(403).json({ error: "L'utilisateur n'as pas peu être modifié"}, { err }));
+							})
+							.catch((error) => res.status(500).json({ error }));
 				})
-			.catch((error) => res.status(500).json({ error }));
+			.catch((error) => res.status(500).json({ error }))	
+				.catch(err => res.status(403).json({ error: "L'ancien mot de passe n'est pas correct" }))
 			})}
-	} else {
+		} else {
 			User.update({ ...req.body }, { where: { id: req.body.id }})
 			.then(() => res.status(201).json({ message: "Utilisateur modifié."}))
 			.catch(err => res.status(403).json({ error: "L'utilisateur n'as pas peu être modifié"}, { err }));
 		}
-}}};
 
+		//CUT
+	}
+	//STOP
+
+}};
 
 // DELETE user
 exports.delete = (req, res, next) => {
+	
+	//CUT
 	if(!req.body.token) { return res.status(400).json({ error: "Vous n'êtes pas authentifié" }, { err })};
-
 	if(req.body.token) {
 		let verifiedToken = jwt.verify(req.body.token, process.env.TOKEN);
 		if(!verifiedToken) { return res.status(400).json({ error: "TOKEN invalid" }, { err })}
-
 		if(verifiedToken) {
+			//STOP
+
 			User.findOne({ where: { id: req.body.id}})
 				.then((user) => {
 					bcrypt.compare(req.body.password, user.password)
@@ -111,6 +111,10 @@ exports.delete = (req, res, next) => {
 				.catch(err => res.status(400).json({error: "Mot de passe incorrect" }, { err }));
 				})
 			.catch(err => res.status(400).json({ error: "Utilisateur non trouvé." }))
+
+			//CUT
 		}
+		//STOP
+
 	}
 };
