@@ -6,6 +6,8 @@ module.exports = (req, res, next) => {
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, process.env.TOKEN);
     const userId = decodedToken.userId;
+    console.log("HERE is the USER ID TO VERIFY :" + userId);
+    console.log(req.body);
     if (req.body.userId && req.body.userId !== userId) {
       return res.status(403).json({ error: new Error('Unauthorized request!')})
     } else {

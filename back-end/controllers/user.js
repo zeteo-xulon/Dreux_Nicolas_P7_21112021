@@ -33,25 +33,25 @@ exports.login = (req, res, next) => {
 			bcrypt.compare(req.body.password, user.password)
 				.then((valid) => {
 					if (!valid) { return res.status(401).json({ error: "Mot de passe incorrect !" }) };
-					res.status(200).json({ id: user.id, token: jwt.sign({	userId: user.id }, process.env.TOKEN, { expiresIn: '24h' })	
-					});
+					res.status(200).json({ id: user.id, token: jwt.sign({	userId: user.id }, process.env.TOKEN, { expiresIn: '24h' })	});
 				})
 				.catch((error) => res.status(500).json({ error }));
 		})
 		.catch((error) => res.status(500).json({ error }));
 };
 
+exports.read = (req, res, next) => {
+	User.findOne({ where: { id: req.params.id}})
+	.then((user) => {
+		console.log(user);
+		res.status(200).json({...user});
+	})
+	.catch(err => res.status(404).json({ error: "L'utilisateur n'as pas pu être trouvé."}, { err }));
+};
+
+
 // UPDATE user
 exports.update = (req, res, next) => {
-
-	//CUT
-	if(!req.body.token) { return res.status(400).json({ error: "Vous n'êtes pas authentifié" }, { err })};
-	if(req.body.token) {
-		let verified = jwt.verify(req.body.token, process.env.TOKEN);
-		console.log(verified);
-		if(!verified) { return res.status(400).json({ error: "TOKEN invalid" }, { err })
-	} else {
-		//STOP
 
 		if(req.body.password){
 			let passwordIsClear = passwordSchema.validate(req.body.password);
@@ -79,23 +79,10 @@ exports.update = (req, res, next) => {
 			.catch(err => res.status(403).json({ error: "L'utilisateur n'as pas peu être modifié"}, { err }));
 		}
 
-		//CUT
-	}
-	//STOP
-
-}};
+};
 
 // DELETE user
 exports.delete = (req, res, next) => {
-	
-	//CUT
-	if(!req.body.token) { return res.status(400).json({ error: "Vous n'êtes pas authentifié" }, { err })};
-	if(req.body.token) {
-		let verifiedToken = jwt.verify(req.body.token, process.env.TOKEN);
-		if(!verifiedToken) { return res.status(400).json({ error: "TOKEN invalid" }, { err })}
-		if(verifiedToken) {
-			//STOP
-
 			User.findOne({ where: { id: req.body.id}})
 				.then((user) => {
 					bcrypt.compare(req.body.password, user.password)
@@ -111,10 +98,4 @@ exports.delete = (req, res, next) => {
 				.catch(err => res.status(400).json({error: "Mot de passe incorrect" }, { err }));
 				})
 			.catch(err => res.status(400).json({ error: "Utilisateur non trouvé." }))
-
-			//CUT
-		}
-		//STOP
-
-	}
 };
