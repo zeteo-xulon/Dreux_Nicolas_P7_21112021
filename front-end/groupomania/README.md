@@ -1,4 +1,4 @@
-# hello-world
+# groupomania
 
 ## Project setup
 ```

@@ -3,3 +3,4 @@ back-end/config
 back-end/images
 back-end/.env
 front-end/connect
+front-end/node_modules
