@@ -1,11 +1,11 @@
 <template>
-  <div class="login">
+  <form class="login">
     <label for="email">Adresse email :</label>
     <input type="email" name="email" id="email">
     <label for="password">Mot de passe :</label>
     <input type="password" name="password" id="password">
     <button @click="submitLogin" class="btn__login">Submit</button>
-  </div>
+  </form>
   
 
 </template>
@@ -14,10 +14,15 @@
 
 <script>
 const axios = require('axios')
-
+const server = 'http://localhost:3000'
 
 export default {
   name: 'Login',
+  data(){
+    return{
+      changeToProfile: false
+    }
+  },
   methods: {
     submitLogin(){
       const email = document.getElementById('email').value;
@@ -26,12 +31,26 @@ export default {
         email: email,
         password: password
       };
-    axios.post('http://localhost:3000/login', {
+    axios.post(server + '/login', {
       ...login
     })
     .then((res) => {
       console.log(res)
-      
+      if(res.status !== 200){
+        alert('Les identifiants sont incorrects')
+      }
+      if(res.status == 200){
+        let userLocal = {
+          id: res.data.id,
+          token: res.data.token
+        };
+        let b = JSON.stringify(userLocal)
+        localStorage.setItem('user', b)
+
+         return this.changeToProfile = true;
+      }
+
+
     })
     .catch(err => console.log(err))
     }

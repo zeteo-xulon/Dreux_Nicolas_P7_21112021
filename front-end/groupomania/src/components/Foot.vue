@@ -1,7 +1,6 @@
 
 <template>
   <footer class="footer">
-    <router-link to="/about">About</router-link>
     <p class="footer__text">
       {{ footer__text }}
     </p>
