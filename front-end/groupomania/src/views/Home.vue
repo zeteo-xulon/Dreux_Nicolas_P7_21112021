@@ -8,16 +8,19 @@
         
       </div>
       <transition name="fade">
-        <MainText v-if="!signUpClick && !logInClick" msg="Bienvenue sur le portail social Groupomania." test="Ce site est un réseau social privé à l'entreprise groupomania." />
+        <MainText 
+        v-if="!signUpClick && !logInClick" 
+        msg="Bienvenue sur le portail social Groupomania." 
+        test="Ce site est un réseau social privé à l'entreprise groupomania." />
       </transition>
                   
       <button class="btn__signup" @click=" signUpClick = !signUpClick ">SIGN UP</button>
-      <button class="btn__signup" @click=" logInClick = !logInClick ">LOG IN</button>
+      <button class="btn__signup" @click=" logInClick = !logInClick  ">LOG IN</button>
       <transition name="fade">
-       <Signup v-if="signUpClick" />
+       <Signup v-if="signUpClick && !logInClick" />
       </transition>
       <transition name="fade">
-        <Login v-if="logInClick" />
+        <Login v-if="logInClick && !signUpClick" />
       </transition>
 
       
@@ -83,7 +86,7 @@ $shadow-color: #b08e8e;
 .logo-block{
   @include center;
   overflow: hidden;
-  height: 90px;
+  height: 200px;
 }
 button {
   font-weight: bold;

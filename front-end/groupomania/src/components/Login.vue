@@ -4,17 +4,37 @@
     <input type="email" name="email" id="email">
     <label for="password">Mot de passe :</label>
     <input type="password" name="password" id="password">
+    <button @click="submitLogin" class="btn__login">Submit</button>
   </div>
+  
 
 </template>
 
 
 
 <script>
+const axios = require('axios')
+
+
 export default {
   name: 'Login',
-  props: {
-
+  methods: {
+    submitLogin(){
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      let login = {
+        email: email,
+        password: password
+      };
+    axios.post('http://localhost:3000/login', {
+      ...login
+    })
+    .then((res) => {
+      console.log(res)
+      
+    })
+    .catch(err => console.log(err))
+    }
   }
 }
 </script>
@@ -46,7 +66,11 @@ $shadow-color: #b08e8e;
   border: 3px solid $secondary-color;
   border-radius: 10px;
 }
-  
+
+.btn__login{
+  min-width: 30%;
+  margin: 1.5rem auto 0rem;
+}
 
 
 </style>

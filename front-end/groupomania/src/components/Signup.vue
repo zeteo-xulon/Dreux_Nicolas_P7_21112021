@@ -11,18 +11,47 @@
       <label for="password">Mot de passe :</label>
       <input type="password" name="password" id="password">
     </div>
-    <button>
-      <router-link class="link" to="/">Home</router-link>
-    </button>
+    <input type="submit" value="submit" id="signupSubmitButton" @click="signupSubmit">
   </div>
 </template>
 
 <script>
+const axios = require('axios');
+
+
 export default {
   name: 'Signup',
   props: {
     
   },
+  data(){
+    return {
+    
+    }
+  },
+  methods: {
+      signupSubmit(){
+      let firstname = document.getElementById('firstname').value;
+      let lastname = document.getElementById('lastname').value;
+      let email = document.getElementById('email').value;
+      let password = document.getElementById('password').value;
+      let userForm = {
+        firstname: firstname,
+        lastname: lastname,
+        email: email,
+        password: password
+      }
+      console.log(userForm);
+      axios.post('http://localhost:3000/signup', {
+        ...userForm
+      })
+      .then((res) => {
+        console.log(res)
+      })
+      .catch(err => console.log(err))
+
+    }
+  }
 }
 </script>
 
