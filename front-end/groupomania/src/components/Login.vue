@@ -13,42 +13,31 @@
 
 
 <script>
-const axios = require('axios')
-const server = 'http://localhost:3000'
+const axios = require('axios');
+const server = 'http://localhost:3000';
+
+
 
 export default {
   name: 'Login',
-  data(){
-    return{
-      changeToProfile: false
-    }
-  },
+ 
   methods: {
     submitLogin(){
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      let login = {
-        email: email,
-        password: password
-      };
-    axios.post(server + '/login', {
-      ...login
-    })
-    .then((res) => {
-      console.log(res)
-      if(res.status !== 200){
-        alert('Les identifiants sont incorrects')
-      }
-      if(res.status == 200){
-        let userLocal = {
-          id: res.data.id,
-          token: res.data.token
-        };
-        let b = JSON.stringify(userLocal)
-        localStorage.setItem('user', b)
+      let login = { email: email, password: password };
 
-         return this.changeToProfile = true;
-      }
+      axios.post(server + '/login', { ...login })
+      .then((res) => {
+        console.log(res)
+        if(res.status !== 200){ alert('Les identifiants sont incorrects') }
+        if(res.status == 200){
+          let userLocal = { id: res.data.id, token: res.data.token };
+          let b = JSON.stringify(userLocal)
+          localStorage.setItem('user', b)
+
+          return this.$router.push({ path: '/profile' });
+        }
 
 
     })

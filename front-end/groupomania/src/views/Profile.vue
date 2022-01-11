@@ -16,7 +16,7 @@
         <label class="bio__label" for="bio">Biographie :</label>
         <textarea name="bioText" class="bio__text" rows="3" cols="10"></textarea>
 
-        <p>Modifier le mot de passe</p>
+        <p @click="displayPassword == true">Modifier le mot de passe</p>
         <div v-if="displayPassword" class="profile__password">
           <label for="password">Mot de passe :</label>
           <input id="oldPassword" type="password" value="">
@@ -28,7 +28,7 @@
         </div>
       </div>
 
-      <router-link to="/">Home</router-link>
+      <!-- <router-link to="/">Home</router-link> -->
     </div>
     <Foot />
   </section>
