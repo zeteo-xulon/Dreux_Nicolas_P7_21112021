@@ -4,7 +4,7 @@
     <input type="email" name="email" id="email">
     <label for="password">Mot de passe :</label>
     <input type="password" name="password" id="password">
-    <button @click="submitLogin" class="btn__login">Submit</button>
+    <button @click.prevent="submitLogin" class="btn__login">Submit</button>
   </form>
   
 
@@ -23,6 +23,7 @@ export default {
  
   methods: {
     submitLogin(){
+      
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       let login = { email: email, password: password };
@@ -36,7 +37,7 @@ export default {
           let b = JSON.stringify(userLocal)
           localStorage.setItem('user', b)
 
-          return this.$router.push({ path: '/profile' });
+         return this.$router.push({ path: '/profile' });
         }
 
 

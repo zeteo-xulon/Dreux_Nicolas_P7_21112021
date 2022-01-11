@@ -2,30 +2,30 @@
   <section>
     <Header />
     <div class="profile">
-      <h1>This is an profile page</h1>
+        <h1>This is an profile page</h1>
 
-      <div class="profile__info">
-        <label for="email">Email :</label>
-        <input type="text" value="">
-        <label for="firstname">Prénom :</label>
-        <input type="text" value="">
-        <label for="lastname">Nom de famille :</label>
-        <input type="text" value="">
-        <label for="job">Poste :</label>
-        <input type="text" value="">
-        <label class="bio__label" for="bio">Biographie :</label>
-        <textarea name="bioText" class="bio__text" rows="3" cols="10"></textarea>
+        <div class="profile__info">
+          <label for="email">Email :</label>
+          <input type="text" value="">
+          <label for="firstname">Prénom :</label>
+          <input type="text" value="">
+          <label for="lastname">Nom de famille :</label>
+          <input type="text" value="">
+          <label for="job">Poste :</label>
+          <input type="text" value="">
+          <label class="bio__label" for="bio">Biographie :</label>
+          <textarea name="bioText" class="bio__text" rows="3" cols="10"></textarea>
 
-        <p @click="displayPassword == true">Modifier le mot de passe</p>
-        <div v-if="displayPassword" class="profile__password">
-          <label for="password">Mot de passe :</label>
-          <input id="oldPassword" type="password" value="">
+          <p @click="displayPassword == true">Modifier le mot de passe</p>
+          <div v-if="displayPassword" class="profile__password">
+              <label for="password">Mot de passe :</label>
+              <input id="oldPassword" type="password" value="">
 
-          <label for="password">Nouveau mot de passe :</label>
-          <input type="password" value="">
-          <label for="password">Vérification mot de passe :</label>
-          <input type="password" value="">
-        </div>
+              <label for="password">Nouveau mot de passe :</label>
+              <input type="password" value="">
+              <label for="password">Vérification mot de passe :</label>
+              <input type="password" value="">
+          </div>
       </div>
 
       <!-- <router-link to="/">Home</router-link> -->
@@ -35,6 +35,9 @@
 </template>
 
 <script>
+  const axios = require('axios');
+  const server = 'http://localhost:3000';
+
   import Header from '@/components/Header.vue';
   import Foot from '@/components/Foot.vue';
 
@@ -47,11 +50,28 @@
     },
     data(){
       return {
-        displayPassword: false
+        displayPassword: false,
+
       }
     },
     methods: {
-
+        getInfo(){
+          let user = JSON.parse(localStorage.getItem('user'));
+          console.log(user);
+          axios.get(server + '/profile/' + user.id, {
+            method: 'GET',
+            data: {
+              token: user.token
+            }
+          })
+          .then((res) => {
+            console.log(res)
+          })
+          .catch(err => console.log(err))
+        }
+    },
+    mounted() {
+      this.getInfo()
     }
   }
 

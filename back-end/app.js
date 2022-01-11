@@ -25,7 +25,7 @@ app.use('', userRoutes);
 
 
 // to auto reset : { force: true }
-db.sequelize.sync({ force: true })
+db.sequelize.sync()
 .then(server)
 .catch( err => console.log({err}));
 
