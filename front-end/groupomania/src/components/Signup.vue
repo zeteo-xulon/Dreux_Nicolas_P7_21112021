@@ -57,16 +57,11 @@ export default {
 
 
 <style lang="scss">
-/*----------  Variables ----------*/
-$primary-color: #f72d02;
-$secondary-color: #fcd7d7;
+@import '../assets/scss/main.scss';
 
-/*----------  Mixins ----------*/
-@mixin center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+/*============================== 
+            PROFILE  
+==============================*/
 .form{
   display: flex;
   flex-flow: column nowrap;

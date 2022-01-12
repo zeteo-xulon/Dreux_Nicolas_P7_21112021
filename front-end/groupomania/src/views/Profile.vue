@@ -6,15 +6,15 @@
 
         <div class="profile__info">
           <label for="email">Email :</label>
-          <input type="text" value="">
+          <input type="email" :value="email">
           <label for="firstname">Prénom :</label>
-          <input type="text" value="">
+          <input type="text" :value="firstname">
           <label for="lastname">Nom de famille :</label>
-          <input type="text" value="">
+          <input type="text" :value="lastname">
           <label for="job">Poste :</label>
-          <input type="text" value="">
+          <input type="text" :value="job">
           <label class="bio__label" for="bio">Biographie :</label>
-          <textarea name="bioText" class="bio__text" rows="3" cols="10"></textarea>
+          <textarea name="bioText" class="bio__text" rows="3" cols="10" :value="bio"></textarea>
 
           <p @click="displayPassword == true">Modifier le mot de passe</p>
           <div v-if="displayPassword" class="profile__password">
@@ -51,24 +51,38 @@
     data(){
       return {
         displayPassword: false,
-
+        email: "",
+        firstname: "",
+        lastname: "",
+        job: "",
+        bio: "",
+        password: ""
       }
     },
     methods: {
         getInfo(){
           let user = JSON.parse(localStorage.getItem('user'));
           console.log(user);
-          axios.get(server + '/profile/' + user.id, {
-            method: 'GET',
-            data: {
-              token: user.token
-            }
-          })
+          axios.post(server + '/profile/' + user.id, { token: user.token })
           .then((res) => {
             console.log(res)
+            console.log(res.data.dataValues)
+            let u = res.data.dataValues;
+            this.firstname = u.firstname;
+            this.lastname = u.lastname;
+            this.email = u.email;
+            this.job = u.job;
+            this.bio = u.bio;
+            this.password = u.password;   
           })
           .catch(err => console.log(err))
-        }
+        },
+      updateUser(){
+
+      },
+      deleteUser(){
+
+      }
     },
     mounted() {
       this.getInfo()
@@ -82,21 +96,11 @@
 
 /<style  lang="scss" scoped>
 
-/*----------  Variables ----------*/
-$primary-color: #f72d02;
-$secondary-color: #fcd7d7;
-$tertiary-color: white;
+@import '../assets/scss/main.scss';
 
-$shadow-color: #b08e8e;
-
-/*----------  Mixins ----------*/
-@mixin center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/*========== GENERAL STYLE  ==========*/
+/*============================== 
+            PROFILE  
+==============================*/
 
 .profile{
   background: lightblue;

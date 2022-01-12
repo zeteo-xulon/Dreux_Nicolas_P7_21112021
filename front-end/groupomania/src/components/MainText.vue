@@ -17,17 +17,7 @@ export default {
 
 
 <style scoped lang="scss">
-/*----------  Variables ----------*/
-$primary-color: #f72d02;
-$secondary-color: #fcd7d7;
-$tertiary-color: white;
-
-/*----------  Mixins ----------*/
-@mixin center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+@import '../assets/scss/main.scss';
 
 h1{
   font-size: 1.3rem;

@@ -3,18 +3,10 @@ const dotenv = require('dotenv').config();
 
 module.exports = (req, res, next) => {
   try {
-    console.log(req.data)
-    // const token = req.headers.authorization.split(' ')[1];
-    const token = req.data.token;
+    const token = req.body.token;
     const decodedToken = jwt.verify(token, process.env.TOKEN);
-    const userId = decodedToken.userId;
-    console.log("HERE is the USER ID TO VERIFY :" + userId);
-    console.log(req.body);
-    if (req.body.userId && req.body.userId !== userId) {
-      return res.status(403).json({ error: new Error('Unauthorized request!')})
-    } else {
-      next();
-    }
+    req.token = decodedToken.userId;
+    next();
   } 
   catch (error) {
     res.status(401).json({ error: new Error('Unauthorized request!')});

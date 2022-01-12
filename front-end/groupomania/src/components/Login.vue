@@ -30,7 +30,6 @@ export default {
 
       axios.post(server + '/login', { ...login })
       .then((res) => {
-        console.log(res)
         if(res.status !== 200){ alert('Les identifiants sont incorrects') }
         if(res.status == 200){
           let userLocal = { id: res.data.id, token: res.data.token };
@@ -51,21 +50,11 @@ export default {
 
 
 <style lang="scss">
+@import '../assets/scss/main.scss';
 
-/*----------  Variables ----------*/
-$primary-color: #f72d02;
-$secondary-color: #fcd7d7;
-$tertiary-color: white;
-
-$shadow-color: #b08e8e;
-
-/*----------  Mixins ----------*/
-@mixin center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
+/*============================== 
+            LOGIN  
+==============================*/
 .login {
   display: flex;
   flex-flow: column nowrap;

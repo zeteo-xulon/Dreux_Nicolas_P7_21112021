@@ -13,8 +13,8 @@
 
 export default {
   name: 'Footer',
-  props: {
-    footer__text: String
+  data() {
+    return { footer__text: "Copyright reserved Groupomania Ltd" }
   }
 }
 </script>
@@ -22,6 +22,10 @@ export default {
 
 
 <style lang="scss">
+/*============================== 
+            FOOTER  
+==============================*/
+
 .footer{
   padding: 1rem 0rem 0rem 0rem;
 }

@@ -26,7 +26,7 @@
       
     </main>
 
-    <Foot footer__text="Copyright reserved Groupomania Ltd" />
+    <Foot />
 
   </div>
 </template>
@@ -68,19 +68,11 @@ export default {
 
 
 <style lang="scss">
-/*----------  Variables ----------*/
-$primary-color: #f72d02;
-$secondary-color: #fcd7d7;
-$tertiary-color: white;
+@import '../assets/scss/main.scss';
 
-$shadow-color: #b08e8e;
-
-/*----------  Mixins ----------*/
-@mixin center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+/*============================== 
+              HOME  
+==============================*/
 
 /*========== GENERAL STYLE  ==========*/
 .logo-block{
