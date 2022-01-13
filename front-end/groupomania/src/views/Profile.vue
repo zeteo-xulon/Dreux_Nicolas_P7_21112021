@@ -1,8 +1,8 @@
 <template>
-  <section>
+  <section class="container">
     <Header />
     <div class="profile">
-        <h1>This is an profile page</h1>
+        <h1>Informations</h1>
 
         <div class="profile__info">
           <label for="email">Email :</label>
@@ -60,6 +60,13 @@
       }
     },
     methods: {
+        loadPage(){
+          if(!localStorage.getItem('user')){
+            return this.$router.push('../views/')
+          } else {
+            this.getInfo()
+          }
+        },
         getInfo(){
           let user = JSON.parse(localStorage.getItem('user'));
           console.log(user);
@@ -84,8 +91,8 @@
 
       }
     },
-    mounted() {
-      this.getInfo()
+    beforeMount(){
+      this.loadPage()
     }
   }
 
@@ -94,29 +101,46 @@
 
 
 
-/<style  lang="scss" scoped>
+/<style scoped lang="scss">
 
 @import '../assets/scss/main.scss';
 
 /*============================== 
             PROFILE  
 ==============================*/
-
+.container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-flow: column nowrap;
+  height: 100vh;
+}
 .profile{
-  background: lightblue;
+  border: 3px solid $primary-color;
   @include center;
   flex-flow: column nowrap;
-  margin: 2rem;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 800px;
   & h1{
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: $primary-color;
+    margin: 1rem .5rem;
   }
   & .profile__info{
     min-width: 200px;
-    max-width: 60%;
+    width: 90%;
     display: flex;
     flex-flow: column nowrap;
   }
+}
+input{
+  border-radius: 5px;
+  box-shadow: inset -3px 1px 3px 0px #cbcbcb;
+}
+textarea{
+  border-radius: 5px;
+  box-shadow: inset -3px 1px 3px 0px #cbcbcb;
 }
 
 </style>

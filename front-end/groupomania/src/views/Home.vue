@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <Header />
+    <img alt="Groupomania logo" src="../assets/images/modif/icon-left-font-svg-r.svg" />
     <!-- Components -->
     <main class="main">
       <div id="nav">
@@ -35,7 +35,6 @@
 
 <script>
 // @ is an alias to /src
-import Header from '@/components/Header.vue';
 import MainText from '@/components/MainText.vue';
 import Signup from '@/components/Signup.vue';
 import Login from '@/components/Login.vue';
@@ -45,7 +44,6 @@ import Foot from '@/components/Foot.vue';
 export default {
   name: 'Home',
   components: {
-    Header,
     MainText,
     Signup,
     Login,
@@ -75,11 +73,7 @@ export default {
 ==============================*/
 
 /*========== GENERAL STYLE  ==========*/
-.logo-block{
-  @include center;
-  overflow: hidden;
-  height: 200px;
-}
+
 button {
   font-weight: bold;
   color: $tertiary-color;
