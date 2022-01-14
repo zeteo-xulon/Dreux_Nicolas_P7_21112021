@@ -8,6 +8,8 @@ const db = require("./models");
 const User = db.user;
 const server = require('./server');
 const userRoutes = require('./routes/user');
+const postRoutes = require('./routes/post');
+// const commentRoutes = require('./routes/comment');
 
 /*----------------------------------------------------------------
 													USE
@@ -22,6 +24,8 @@ app.use((req, res, next) => {
 });
 
 app.use('', userRoutes);
+app.use('', postRoutes);
+// app.use('', commentRoutes);
 
 
 // to auto reset : { force: true }
