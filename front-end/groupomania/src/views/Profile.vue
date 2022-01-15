@@ -16,16 +16,16 @@
           <label class="bio__label" for="bio">Biographie :</label>
           <textarea name="bioText" class="bio__text" rows="3" cols="10" :value="bio"></textarea>
 
-          <p @click="displayPassword == true">Modifier le mot de passe</p>
-          <div v-if="displayPassword" class="profile__password">
-              <label for="password">Mot de passe :</label>
-              <input id="oldPassword" type="password" value="">
+          <p @click="showPasswordUpdateContainer == true" class="password__update">Modifier le mot de passe</p>
+          <form v-if="showPasswordUpdateContainer" class="profile__password">
+              <label for="password">Ancien mot de passe :</label>
+              <input id="oldPassword" type="password"  minlength="8">
 
               <label for="password">Nouveau mot de passe :</label>
-              <input type="password" value="">
+              <input type="password"   minlength="8">
               <label for="password">Vérification mot de passe :</label>
-              <input type="password" value="">
-          </div>
+              <input type="password"  minlength="8">
+          </form>
       </div>
 
       <!-- <router-link to="/">Home</router-link> -->
@@ -36,7 +36,7 @@
 
 <script>
   const axios = require('axios');
-  const server = 'http://localhost:3000';
+  const server = 'http://localhost:3000/profile';
 
   import Header from '@/components/Header.vue';
   import Foot from '@/components/Foot.vue';
@@ -50,7 +50,7 @@
     },
     data(){
       return {
-        displayPassword: false,
+        showPasswordUpdateContainer: false,
         email: "",
         firstname: "",
         lastname: "",
@@ -70,7 +70,7 @@
         getInfo(){
           let user = JSON.parse(localStorage.getItem('user'));
           console.log(user);
-          axios.post(server + '/profile/' + user.id, { token: user.token })
+          axios.get(server + '/' + user.id)
           .then((res) => {
             console.log(res)
             console.log(res.data.dataValues)
@@ -108,6 +108,7 @@
 /*============================== 
             PROFILE  
 ==============================*/
+
 .container{
   display: flex;
   align-items: center;
@@ -115,6 +116,7 @@
   flex-flow: column nowrap;
   height: 100vh;
 }
+
 .profile{
   border: 3px solid $primary-color;
   @include center;
@@ -122,6 +124,7 @@
   border-radius: 20px;
   width: 100%;
   max-width: 800px;
+  padding: 1rem 0rem;
   & h1{
     font-size: 1.5rem;
     color: $primary-color;
@@ -134,13 +137,34 @@
     flex-flow: column nowrap;
   }
 }
+
 input{
   border-radius: 5px;
   box-shadow: inset -3px 1px 3px 0px #cbcbcb;
 }
+
 textarea{
   border-radius: 5px;
   box-shadow: inset -3px 1px 3px 0px #cbcbcb;
+}
+
+.password__update{
+  border-top: 4px double $primary-color;
+  width: 100%;
+  padding: 15px 0px 0px 0px;
+  font-weight: bold;
+  color: $primary-color;
+  cursor: pointer;
+}
+
+.profile__password{
+  display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    & input{
+      width: 100%;
+    }
 }
 
 </style>

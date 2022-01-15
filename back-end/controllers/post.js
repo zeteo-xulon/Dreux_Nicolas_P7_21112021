@@ -20,7 +20,10 @@ exports.createPost = (req, res, next) => {
 
 exports.readPost = (req, res, next) => {
   Post.findAll()
-  .then(() => res.status(200).json({ message: "Post trouvé" }))
+  .then((e) => {
+
+    res.status(200).json(e)
+  })
   .catch((error) => res.status(400).json({ error }));
 }
 

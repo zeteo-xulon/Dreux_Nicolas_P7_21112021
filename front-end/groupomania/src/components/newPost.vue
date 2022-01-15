@@ -9,7 +9,7 @@
 
       <div class="form__input__container">
         <label class="form__title" for="post">Texte :</label>
-        <textarea class="form__text" rows="5" cols="30" v-model="postText">
+        <textarea class="form__text" rows="5" cols="20" v-model="postText">
         </textarea>
       </div>
       <input type="file" @click="addImage">
@@ -24,7 +24,7 @@
 const axios = require('axios');
 
 export default {
-  name: 'newPost',
+  name: 'NewPost',
   data(){
     return {
       postText: "",
@@ -68,7 +68,8 @@ export default {
       width: 100%;
     }
   }
-  & .form__text__container{
+  & .form__input__container{
+    width: 100%;
     & .form__text{
      width: 100%;
     }

@@ -41,6 +41,7 @@ exports.login = (req, res, next) => {
 };
 
 exports.read = (req, res, next) => {
+	console.log('Here is the req.params :' + req.params);
 	User.findOne({ where: { id: req.params.id}})
 	.then((user) => {
 		console.log(user);
