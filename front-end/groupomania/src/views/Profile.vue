@@ -4,19 +4,34 @@
     <div class="profile">
         <h1>Informations</h1>
 
-        <div class="profile__info">
+        <div v-if="!showUpdateProfile" class="profile__display">
+          <p class="email">{{ email }}</p>
+          <p class="firstname">{{ firstname }}</p>
+          <p class="lastname">{{ lastname }}</p>
+          <p class="job">{{ job }}</p>
+          <p class="bio">{{ bio }}</p>
+          <button @click="verifyUser" class="show-info__container">Modifier les informations personnel</button>
+        </div>
+        
+        
+       <article v-if="showUpdateProfile" class="profile__info">
           <label for="email">Email :</label>
-          <input type="email" :value="email">
+          <input type="email" :value="email" id="profileEmail">
           <label for="firstname">Prénom :</label>
-          <input type="text" :value="firstname">
+          <input type="text" :value="firstname" id="profileFirstname">
           <label for="lastname">Nom de famille :</label>
-          <input type="text" :value="lastname">
+          <input type="text" :value="lastname" id="profileLastname">
           <label for="job">Poste :</label>
-          <input type="text" :value="job">
+          <input type="text" :value="job" id="profileJob">
           <label class="bio__label" for="bio">Biographie :</label>
-          <textarea name="bioText" class="bio__text" rows="3" cols="10" :value="bio"></textarea>
+          <textarea name="bioText" class="bio__text" rows="3" cols="10" :value="bio" id="profileBio"></textarea>
+          
+          <div class="btn-container">
+            <button @click="verifyUser" class="profile__return-btn">Annuler</button>
+            <button @click="updateUser" class="profile__update-btn">Soumettre</button>
+          </div>
 
-          <p @click="showPasswordUpdateContainer == true" class="password__update">Modifier le mot de passe</p>
+          <p class="password__update">Modifier le mot de passe</p>
           <form v-if="showPasswordUpdateContainer" class="profile__password">
               <label for="password">Ancien mot de passe :</label>
               <input id="oldPassword" type="password"  minlength="8">
@@ -26,7 +41,8 @@
               <label for="password">Vérification mot de passe :</label>
               <input type="password"  minlength="8">
           </form>
-      </div>
+      </article>
+       
 
       <!-- <router-link to="/">Home</router-link> -->
     </div>
@@ -51,6 +67,7 @@
     data(){
       return {
         showPasswordUpdateContainer: false,
+        showUpdateProfile: false,
         email: "",
         firstname: "",
         lastname: "",
@@ -84,8 +101,33 @@
           })
           .catch(err => console.log(err))
         },
+        verifyUser(){
+          !this.showUpdateProfile ? this.showUpdateProfile = true : this.showUpdateProfile = false ;
+        },
       updateUser(){
+        let user = JSON.parse(localStorage.getItem('user'));
+        let email = document.getElementById('profileEmail').value;
+        let firstname = document.getElementById('profileFirstname').value;
+        let lastname = document.getElementById('profileLastname').value;
+        let job = document.getElementById('profileJob').value;
+        let bio = document.getElementById('profileBio').value;
 
+        let dataToUpdate = {
+          id: user.id,
+          email: email,
+          firstname: firstname,
+          lastname: lastname,
+          job: job,
+          bio: bio,
+          token: user.token
+        };
+        console.log(dataToUpdate);
+        console.log(user);
+        axios.put(server + '/' + user.id, { ...dataToUpdate })
+        .then((res) => {
+          console.log(res)
+        })
+        .catch(err => console.log(err))
       },
       deleteUser(){
 
@@ -101,7 +143,7 @@
 
 
 
-/<style scoped lang="scss">
+<style scoped lang="scss">
 
 @import '../assets/scss/main.scss';
 
@@ -130,12 +172,13 @@
     color: $primary-color;
     margin: 1rem .5rem;
   }
-  & .profile__info{
-    min-width: 200px;
-    width: 90%;
-    display: flex;
-    flex-flow: column nowrap;
-  }
+}
+
+.profile__info{
+  min-width: 200px;
+  width: 90%;
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 input{
@@ -165,6 +208,9 @@ textarea{
     & input{
       width: 100%;
     }
+}
+.profile__return-btn{
+  margin: .5rem 0rem;
 }
 
 </style>

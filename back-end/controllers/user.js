@@ -53,44 +53,38 @@ exports.read = (req, res, next) => {
 
 // UPDATE user
 exports.update = (req, res, next) => {
-	User.findOne({ where:  { id: req.body.id } })
-	.then((user) => {
-			if(user.id !== req.token) {	return res.status(401).json({ message: 'Not Authorized' })
-			} else {
-				if(req.body.password){
-				let passwordIsClear = passwordSchema.validate(req.body.password);
-				if(!passwordIsClear) { return res.status(400).json({ error: "Le mot de passe est incorrect" }, { err })};
-				if(passwordIsClear){
-				User.findOne({ where: { id: req.body.id }})
-				.then((user) => {
-						bcrypt.compare(req.body.oldpassword, user.password)
-						.then((valid) => {
-							if(!valid) { return res.status(401).json({ error: "Les mots de passe ne correspondent pas." }) };
-								bcrypt.hash(req.body.password, 10)
-								.then((hash) => {
-									User.update({ password: hash }, { where: { id: req.body.id }})
+		if(req.body.password){
+		let passwordIsClear = passwordSchema.validate(req.body.password);
+		if(!passwordIsClear) { return res.status(400).json({ error: "Le mot de passe est incorrect" }, { err })};
+		if(passwordIsClear){
+			User.findOne({ where: { id: req.token }})
+			.then((user) => {
+					bcrypt.compare(req.body.oldpassword, user.password)
+					.then((valid) => {
+						if(!valid) { return res.status(401).json({ error: "Les mots de passe ne correspondent pas." }) };
+							bcrypt.hash(req.body.password, 10)
+							.then((hash) => {
+								User.update({ password: hash }, { where: { id: req.body.id }})
 									.then(() => res.status(201).json({ message: "Utilisateur modifié."}))
-									.catch(err => res.status(403).json({ error: "L'utilisateur n'as pas peu être modifié"}, { err }));
-								})
-								.catch((error) => res.status(500).json({ error }));
-					})
+									.catch(err => res.status(403).json({ error: "Le mot de passe utilisateur n'as pas peu être modifié", error: err }));
+							})
+							.catch((error) => res.status(500).json({ error }));
+				})
 				.catch((error) => res.status(500).json({ error }))	
-					.catch(err => res.status(403).json({ error: "L'ancien mot de passe n'est pas correct" }))
-				})}
-			} else {
-				User.update({ ...req.body }, { where: { id: req.body.id }})
-				.then(() => res.status(201).json({ message: "Utilisateur modifié."}))
-				.catch(err => res.status(403).json({ error: "L'utilisateur n'as pas peu être modifié"}, { err }));
-			}}})
-	.catch(err => res.status(500).json({ err }));
+			.catch(err => res.status(403).json({ error: "L'ancien mot de passe n'est pas correct" }))
+			})}
+		} else {
+			User.update(req.body, { where: { id: req.token }})
+			.then(() =>  res.status(201).json({ message: "Utilisateur modifié."}))
+			.catch(err => res.status(403).json({ message: "Le profile utilisateur n'as pu être modifié.",
+		error: err }))
+	}
 };
 
 // DELETE user
 exports.delete = (req, res, next) => {
-			User.findOne({ where: { id: req.body.id}})
+			User.findOne({ where: { id: req.token}})
 				.then((user) => {
-					if(user.id !== req.token) {	return res.status(401).json({ message: 'Not Authorized' })
-					} else {
 						bcrypt.compare(req.body.password, user.password)
 						.then((valid) => {
 							if(!valid) { return res.status(401).json({ error: "Mot de passe incorrect !" }) };
@@ -101,6 +95,6 @@ exports.delete = (req, res, next) => {
 							}
 						})
 					.catch(err => res.status(400).json({error: "Mot de passe incorrect" }, { err }));
-					}})
+					})
 			.catch(err => res.status(400).json({ error: "Utilisateur non trouvé." }))
 };
