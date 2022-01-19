@@ -4,11 +4,22 @@
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const passwordSchema = require("../middlewares/password");
+const fs = require('fs');
 const db = require("../models");
 const User = db.user;
 /*----------------------------------------------------------------
 													CONTROLLER
 ----------------------------------------------------------------*/
+
+ async function findUser(res, req, next) {
+	await User.findOne({ where: { id: req.token }})
+	.then((e) => {
+		return e;
+	})
+	.catch(err => res.status(401).json({ err }))
+};
+
+
 //	(1) Check the password requirement, (2) crypt it, (3) and save the user.
 exports.signup = (req, res, next) => {
 	let passwordIsClear = passwordSchema.validate(req.body.password);
@@ -44,7 +55,6 @@ exports.read = (req, res, next) => {
 	console.log('Here is the req.params :' + req.params);
 	User.findOne({ where: { id: req.params.id}})
 	.then((user) => {
-		console.log(user);
 		res.status(200).json({...user});
 	})
 	.catch(err => res.status(404).json({ error: "L'utilisateur n'as pas pu être trouvé."}, { err }));
@@ -53,6 +63,8 @@ exports.read = (req, res, next) => {
 
 // UPDATE user
 exports.update = (req, res, next) => {
+	console.log(req.body);
+	console.log(req.file);
 		if(req.body.password){
 		let passwordIsClear = passwordSchema.validate(req.body.password);
 		if(!passwordIsClear) { return res.status(400).json({ error: "Le mot de passe est incorrect" }, { err })};
@@ -73,6 +85,23 @@ exports.update = (req, res, next) => {
 				.catch((error) => res.status(500).json({ error }))	
 			.catch(err => res.status(403).json({ error: "L'ancien mot de passe n'est pas correct" }))
 			})}
+		}else if (req.file){
+			let userData = findUser(req, res, next);
+			console.log("88");
+			console.log(userData);
+			if(userData.avatar !== "http://localhost:3000/images/default-avatar.jpg"){
+				const imageName = userData.avatar.split("/images/")[1];
+				fs.unlink(`images/${imageName}`, () =>{
+					User.update(req.file, { where: { id: req.token }})
+					.then(() => res.status(201).json({ message: "Avatar modifié." }))
+					.catch((err) => res.status(400).json({ err, message: "L'Avatar n'as pas pu êter modifié." }))	
+				})
+			} else {
+			User.update(req.file, { where: { id: req.token }})
+			.then(() => res.status(201).json({ message: "Avatar modifié." }))
+			.catch((err) => res.status(400).json({ err, message: "L'Avatar n'as pas pu êter modifié." }))	
+			}
+			
 		} else {
 			User.update(req.body, { where: { id: req.token }})
 			.then(() =>  res.status(201).json({ message: "Utilisateur modifié."}))
@@ -98,3 +127,4 @@ exports.delete = (req, res, next) => {
 					})
 			.catch(err => res.status(400).json({ error: "Utilisateur non trouvé." }))
 };
+

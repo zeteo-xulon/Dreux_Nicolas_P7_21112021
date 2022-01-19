@@ -7,6 +7,7 @@ const dotenv = require('dotenv').config();
 const db = require("./models");
 const User = db.user;
 const server = require('./server');
+const path = require('path');
 const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
 // const commentRoutes = require('./routes/comment');
@@ -15,6 +16,7 @@ const postRoutes = require('./routes/post');
 													USE
 ----------------------------------------------------------------*/
 app.use(express.json());
+
 // CORS
 app.use((req, res, next) => {
 	res.setHeader("Access-Control-Allow-Origin", "*");
@@ -23,6 +25,9 @@ app.use((req, res, next) => {
 	next();
 });
 
+
+
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('', userRoutes);
 app.use('', postRoutes);
 // app.use('', commentRoutes);

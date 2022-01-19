@@ -33,6 +33,11 @@ module.exports = (sequelize, Datatypes) => {
       type : Datatypes.TEXT,
       allowNull: true
     },
+    avatar: {
+      type: Datatypes.STRING(200),
+      allowNull: true,
+      defaultValue:"http://localhost:3000/images/default-avatar.jpg"
+    },
     role_id: {
       type: Datatypes.INTEGER,
       allowNull: false,

@@ -5,16 +5,28 @@
         <h1>Informations</h1>
 
         <div v-if="!showUpdateProfile" class="profile__display">
-          <p class="email">{{ email }}</p>
-          <p class="firstname">{{ firstname }}</p>
-          <p class="lastname">{{ lastname }}</p>
-          <p class="job">{{ job }}</p>
-          <p class="bio">{{ bio }}</p>
+          <img :src="avatar" alt="avatar picture" class="profile__avatar" id="profileAvatar"/>
+          <p class="email">Adresse email : {{ email }}</p>
+          <p class="firstname">Prénom : {{ firstname }}</p>
+          <p class="lastname">Nom de famille : {{ lastname }}</p>
+          <p class="job">Poste : {{ job }}</p>
+          <p class="bio">Biographie : {{ bio }}</p>
           <button @click="verifyUser" class="show-info__container">Modifier les informations personnel</button>
         </div>
         
         
        <article v-if="showUpdateProfile" class="profile__info">
+
+          <div class="profile__avatar__container">
+            <img :src="avatar" alt="avatar picture" class="profile__avatar" id="profileAvatar"/>
+            <input 
+            type="file" 
+            @change="updateAvatar" 
+            name="image" 
+            class="avatar__file" 
+            id="avatarFile">
+           </div>
+
           <label for="email">Email :</label>
           <input type="email" :value="email" id="profileEmail">
           <label for="firstname">Prénom :</label>
@@ -50,6 +62,8 @@
   </section>
 </template>
 
+
+
 <script>
   const axios = require('axios');
   const server = 'http://localhost:3000/profile';
@@ -73,7 +87,8 @@
         lastname: "",
         job: "",
         bio: "",
-        password: ""
+        password: "",
+        avatar: ""
       }
     },
     methods: {
@@ -97,7 +112,8 @@
             this.email = u.email;
             this.job = u.job;
             this.bio = u.bio;
-            this.password = u.password;   
+            this.password = u.password;
+            this.avatar = u.avatar;  
           })
           .catch(err => console.log(err))
         },
@@ -106,6 +122,8 @@
         },
       updateUser(){
         let user = JSON.parse(localStorage.getItem('user'));
+        let config = { headers: { 'Authorization': user.token }};
+
         let email = document.getElementById('profileEmail').value;
         let firstname = document.getElementById('profileFirstname').value;
         let lastname = document.getElementById('profileLastname').value;
@@ -118,16 +136,39 @@
           firstname: firstname,
           lastname: lastname,
           job: job,
-          bio: bio,
-          token: user.token
+          bio: bio
         };
+
         console.log(dataToUpdate);
-        console.log(user);
-        axios.put(server + '/' + user.id, { ...dataToUpdate })
+
+        axios.put(server + '/' + user.id, { ...dataToUpdate }, config)
         .then((res) => {
           console.log(res)
+          this.getInfo();
         })
         .catch(err => console.log(err))
+      },
+      updateAvatar(event){
+        let user = JSON.parse(localStorage.getItem('user'));
+        
+        let picture = event.target.files[0];
+        // let config = { headers: { 'Authorization': user.token }};
+        console.log(picture);
+
+        axios({
+          method: 'put',
+          url: server + '/' + user.id,
+          headers: { 'Authorization': user.token },
+          data: { image: picture }
+        })
+        .then((res) => console.log(res))
+        .catch(err => console.log(err))
+
+        // axios.put(server + '/' + user.id, { ...picture }, config)
+        // .then((res) => {
+        //   console.log(res)
+        // })
+        // .catch(err => console.log(err))
       },
       deleteUser(){
 
@@ -174,21 +215,26 @@
   }
 }
 
+
+
 .profile__info{
   min-width: 200px;
   width: 90%;
   display: flex;
   flex-flow: column nowrap;
+  align-items: center;
 }
 
 input{
   border-radius: 5px;
   box-shadow: inset -3px 1px 3px 0px #cbcbcb;
+  width: 100%;
 }
 
 textarea{
   border-radius: 5px;
   box-shadow: inset -3px 1px 3px 0px #cbcbcb;
+  width: 100%;
 }
 
 .password__update{
@@ -211,6 +257,29 @@ textarea{
 }
 .profile__return-btn{
   margin: .5rem 0rem;
+}
+.profile__avatar__container{
+  position: relative;
+}
+.profile__avatar{
+  border: 1px solid $primary-color;
+  border-radius: 50%;
+  min-height: 150px;
+  min-width: 150px;
+  max-height: 50%;
+  max-width: 50%;
+  z-index: 1;
+}
+.avatar__file{
+  position: absolute;
+  z-index: 2;
+  right: 0%;
+  border-radius: 50%;
+  min-height: 150px;
+  min-width: 150px;
+  max-height: 50%;
+  max-width: 50%;
+  font-size: 0pc;
 }
 
 </style>

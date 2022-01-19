@@ -30,6 +30,7 @@
     "fs": "^0.0.1-security",
     "helmet": "^4.6.0",
     "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.4",
     "mysql2": "^2.3.3",
     "node": "^17.1.0",
     "nodemon": "^2.0.15",
