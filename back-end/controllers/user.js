@@ -11,14 +11,6 @@ const User = db.user;
 													CONTROLLER
 ----------------------------------------------------------------*/
 
- async function findUser(res, req, next) {
-	await User.findOne({ where: { id: req.token }})
-	.then((e) => {
-		return e;
-	})
-	.catch(err => res.status(401).json({ err }))
-};
-
 
 //	(1) Check the password requirement, (2) crypt it, (3) and save the user.
 exports.signup = (req, res, next) => {
@@ -64,51 +56,67 @@ exports.read = (req, res, next) => {
 // UPDATE user
 exports.update = (req, res, next) => {
 	console.log(req.body);
-	console.log(req.file);
-		if(req.body.password){
-		let passwordIsClear = passwordSchema.validate(req.body.password);
-		if(!passwordIsClear) { return res.status(400).json({ error: "Le mot de passe est incorrect" }, { err })};
-		if(passwordIsClear){
-			User.findOne({ where: { id: req.token }})
-			.then((user) => {
-					bcrypt.compare(req.body.oldpassword, user.password)
-					.then((valid) => {
-						if(!valid) { return res.status(401).json({ error: "Les mots de passe ne correspondent pas." }) };
-							bcrypt.hash(req.body.password, 10)
-							.then((hash) => {
-								User.update({ password: hash }, { where: { id: req.body.id }})
-									.then(() => res.status(201).json({ message: "Utilisateur modifié."}))
-									.catch(err => res.status(403).json({ error: "Le mot de passe utilisateur n'as pas peu être modifié", error: err }));
-							})
-							.catch((error) => res.status(500).json({ error }));
-				})
-				.catch((error) => res.status(500).json({ error }))	
-			.catch(err => res.status(403).json({ error: "L'ancien mot de passe n'est pas correct" }))
-			})}
-		}else if (req.file){
-			let userData = findUser(req, res, next);
-			console.log("88");
-			console.log(userData);
-			if(userData.avatar !== "http://localhost:3000/images/default-avatar.jpg"){
-				const imageName = userData.avatar.split("/images/")[1];
-				fs.unlink(`images/${imageName}`, () =>{
-					User.update(req.file, { where: { id: req.token }})
-					.then(() => res.status(201).json({ message: "Avatar modifié." }))
-					.catch((err) => res.status(400).json({ err, message: "L'Avatar n'as pas pu êter modifié." }))	
-				})
-			} else {
-			User.update(req.file, { where: { id: req.token }})
-			.then(() => res.status(201).json({ message: "Avatar modifié." }))
-			.catch((err) => res.status(400).json({ err, message: "L'Avatar n'as pas pu êter modifié." }))	
-			}
-			
-		} else {
-			User.update(req.body, { where: { id: req.token }})
-			.then(() =>  res.status(201).json({ message: "Utilisateur modifié."}))
-			.catch(err => res.status(403).json({ message: "Le profile utilisateur n'as pu être modifié.",
-		error: err }))
-	}
+	if(req.file || req.body.password) { return res.status(403).json({ message: 'WRONG REQUEST.' }) };
+	User.update(req.body, { where: { id: req.token }})
+	.then(() =>  res.status(201).json({ message: "Utilisateur modifié."}))
+	.catch(err => res.status(403).json({ message: "L'erreur suivante est survenue : ", error: err }))
 };
+
+exports.updatePassword = (req, res, next) => {
+	console.log(req.body.password);
+
+	let passwordIsClear = passwordSchema.validate(req.body.password);
+	if(!passwordIsClear) { return res.status(400).json({ error: "Le mot de passe est incorrect" }, { err })};
+	if(passwordIsClear){
+		User.findOne({ where: { id: req.token }})
+		.then((user) => {
+				bcrypt.compare(req.body.oldpassword, user.password)
+				.then((valid) => {
+					if(!valid) { return res.status(401).json({ error: "Les mots de passe ne correspondent pas." }) };
+						bcrypt.hash(req.body.password, 10)
+						.then((hash) => {
+							User.update({ password: hash }, { where: { id: req.body.id }})
+								.then(() => res.status(201).json({ message: "Utilisateur modifié."}))
+								.catch(err => res.status(403).json({ error: "Le mot de passe utilisateur n'as pas peu être modifié", error: err }));
+						})
+						.catch((error) => res.status(500).json({ error }));
+			})
+			.catch((error) => res.status(500).json({ error }))	
+		.catch(err => res.status(403).json({ error: "L'ancien mot de passe n'est pas correct" }))
+		})}
+};
+
+exports.updateProfileImage = (req, res, next) => {
+	console.log(req.file);
+	User.findOne({ where: { id: req.token }})
+	.then((e) => {
+		console.log("94");
+		console.log(e);
+		const avatar = `${req.protocol}://${req.get("host")}/images/${ req.file.filename }`;
+		console.log(avatar);
+		console.log(req.token);
+		
+		if(e.avatar !== "http://localhost:3000/images/default-avatar.jpg"){
+			console.log('Avatar autre que celui par default');
+			const imageName = e.avatar.split("/images/")[1];
+			console.log(imageName);
+			fs.unlink(`images/${imageName}`, () =>{
+				User.update({ avatar: avatar }, { where: { id: req.token }})
+				.then(() => res.status(201).json({ message: "Avatar modifié." }))
+				.catch((err) => res.status(400).json({ err, message: "L'Avatar n'as pas pu êter modifié." }))	
+			})
+		} else {
+			console.log('Avatar par default');
+			User.update({ avatar: avatar }, { where: { id: req.token }})
+			.then(() => res.status(201).json({ message: "Avatar modifié." }))
+			.catch((err) => res.status(400).json({ err, message: "L'Avatar n'as pas pu être modifié." }))	
+		}
+	})
+	.catch(err => res.status(401).json({ err }));
+	
+};
+
+
 
 // DELETE user
 exports.delete = (req, res, next) => {

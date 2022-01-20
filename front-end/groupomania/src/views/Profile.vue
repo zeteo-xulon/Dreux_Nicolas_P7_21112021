@@ -4,7 +4,7 @@
     <div class="profile">
         <h1>Informations</h1>
 
-        <div v-if="!showUpdateProfile" class="profile__display">
+        <div v-if="displayProfile" class="profile__display">
           <img :src="avatar" alt="avatar picture" class="profile__avatar" id="profileAvatar"/>
           <p class="email">Adresse email : {{ email }}</p>
           <p class="firstname">Prénom : {{ firstname }}</p>
@@ -24,7 +24,9 @@
             @change="updateAvatar" 
             name="image" 
             class="avatar__file" 
-            id="avatarFile">
+            id="avatarFile"
+            title="Le fichier doit être une image de 2 Mo maximum."
+            >
            </div>
 
           <label for="email">Email :</label>
@@ -43,8 +45,11 @@
             <button @click="updateUser" class="profile__update-btn">Soumettre</button>
           </div>
 
-          <p class="password__update">Modifier le mot de passe</p>
-          <form v-if="showPasswordUpdateContainer" class="profile__password">
+          <p @click="showPasswordContainer" class="password__update">Modifier le mot de passe</p>
+      </article>
+
+      <aside v-if="showPasswordUpdateContainer" class="password__container">
+          <form class="profile__password">
               <label for="password">Ancien mot de passe :</label>
               <input id="oldPassword" type="password"  minlength="8">
 
@@ -52,11 +57,13 @@
               <input type="password"   minlength="8">
               <label for="password">Vérification mot de passe :</label>
               <input type="password"  minlength="8">
+              <div class="password__btn-container">
+                <button @click="showPasswordContainer" class="profile__return-btn">Annuler</button>
+                <button @click="updatePassword" class="profile__update-btn">Soumettre</button>
+              </div>
           </form>
-      </article>
+      </aside>
        
-
-      <!-- <router-link to="/">Home</router-link> -->
     </div>
     <Foot />
   </section>
@@ -80,6 +87,7 @@
     },
     data(){
       return {
+        displayProfile: true,
         showPasswordUpdateContainer: false,
         showUpdateProfile: false,
         email: "",
@@ -118,61 +126,96 @@
           .catch(err => console.log(err))
         },
         verifyUser(){
-          !this.showUpdateProfile ? this.showUpdateProfile = true : this.showUpdateProfile = false ;
+          if(!this.showUpdateProfile){
+            this.showUpdateProfile = true;
+            this.displayProfile = false;
+          } else {
+            this.showUpdateProfile = false ;
+            this.displayProfile = true;
+          }
         },
-      updateUser(){
-        let user = JSON.parse(localStorage.getItem('user'));
-        let config = { headers: { 'Authorization': user.token }};
+        showPasswordContainer(){
+          if(!this.showPasswordUpdateContainer){
+            this.showPasswordUpdateContainer = true;
+            this.showUpdateProfile = false;
+          } else {
+            this.showPasswordUpdateContainer = false ;
+            this.showUpdateProfile = false;
+            this.displayProfile = true;
+          }
+        },
+        updateUser(){
+          let user = JSON.parse(localStorage.getItem('user'));
+          let config = { headers: { 'Authorization': user.token }};
 
-        let email = document.getElementById('profileEmail').value;
-        let firstname = document.getElementById('profileFirstname').value;
-        let lastname = document.getElementById('profileLastname').value;
-        let job = document.getElementById('profileJob').value;
-        let bio = document.getElementById('profileBio').value;
+          let email = document.getElementById('profileEmail').value;
+          let firstname = document.getElementById('profileFirstname').value;
+          let lastname = document.getElementById('profileLastname').value;
+          let job = document.getElementById('profileJob').value;
+          let bio = document.getElementById('profileBio').value;
 
-        let dataToUpdate = {
-          id: user.id,
-          email: email,
-          firstname: firstname,
-          lastname: lastname,
-          job: job,
-          bio: bio
-        };
+          let dataToUpdate = {
+            id: user.id,
+            email: email,
+            firstname: firstname,
+            lastname: lastname,
+            job: job,
+            bio: bio
+          };
 
-        console.log(dataToUpdate);
+          console.log(dataToUpdate);
 
-        axios.put(server + '/' + user.id, { ...dataToUpdate }, config)
-        .then((res) => {
-          console.log(res)
-          this.getInfo();
-        })
-        .catch(err => console.log(err))
-      },
-      updateAvatar(event){
-        let user = JSON.parse(localStorage.getItem('user'));
-        
-        let picture = event.target.files[0];
-        // let config = { headers: { 'Authorization': user.token }};
-        console.log(picture);
+          axios.put(server + '/' + user.id, { ...dataToUpdate }, config)
+          .then((res) => {
+            console.log(res);
+            this.getInfo();
+            return this.showUpdateProfile = false;
+          })
+          .catch(err => console.log(err))
+        },
+        updateAvatar(event){
+          let user = JSON.parse(localStorage.getItem('user'));
+          let urlImage = server + "/images/" + user.id;
+          let picture = event.target.files[0];
+          let formData = new FormData();
+          formData.append('image', picture);
+          let config = { headers: { 'Authorization': user.token }};
+          console.log(picture);
 
-        axios({
-          method: 'put',
-          url: server + '/' + user.id,
-          headers: { 'Authorization': user.token },
-          data: { image: picture }
-        })
-        .then((res) => console.log(res))
-        .catch(err => console.log(err))
+          axios.put(urlImage, formData, config)
+          .then((res) => {
+            console.log(res);
+            this.getInfo();
+            return this.showUpdateProfile = false;
+          })
+          .catch((err) => {
+            console(err);
+            alert('Le fichier doit être une image de moins de 2 Mo.');
+            })
+        },
+        updatePassword(){
+          let user = JSON.parse(localStorage.getItem('user'));
+          let urlImage = server + "/images/" + user.id;
+          let picture = event.target.files[0];
+          let formData = new FormData();
+          formData.append('image', picture);
+          let config = { headers: { 'Authorization': user.token }};
+          console.log(picture);
 
-        // axios.put(server + '/' + user.id, { ...picture }, config)
-        // .then((res) => {
-        //   console.log(res)
-        // })
-        // .catch(err => console.log(err))
-      },
-      deleteUser(){
+          axios.put(urlImage, formData, config)
+          .then((res) => {
+            console.log(res);
+            this.getInfo();
+            return this.showUpdateProfile = false;
+          })
+          .catch((err) => {
+            console(err);
+            alert('Le fichier doit être une image de moins de 2 Mo.');
+            })
+        },
+        deleteUser(){
 
-      }
+        }
     },
     beforeMount(){
       this.loadPage()
@@ -251,8 +294,15 @@ textarea{
     flex-direction: column;
     align-items: flex-start;
     width: 100%;
+    padding: 1rem;
     & input{
       width: 100%;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+    & label{
+      font-weight: bold;
+
     }
 }
 .profile__return-btn{
@@ -260,26 +310,43 @@ textarea{
 }
 .profile__avatar__container{
   position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 .profile__avatar{
   border: 1px solid $primary-color;
   border-radius: 50%;
-  min-height: 150px;
-  min-width: 150px;
-  max-height: 50%;
-  max-width: 50%;
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
   z-index: 1;
 }
 .avatar__file{
   position: absolute;
   z-index: 2;
-  right: 0%;
+  right: 35%;
   border-radius: 50%;
-  min-height: 150px;
-  min-width: 150px;
-  max-height: 50%;
-  max-width: 50%;
-  font-size: 0pc;
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  font-size: 0px;
+  border: 0px solid transparent;
+  box-shadow: 0px 0px 0px transparent;
+  cursor: pointer;
+}
+.password__containe{
+  width: 100%;
+}
+.password__btn-container{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 1rem 0rem;
+  gap: 1rem;
+  & button{
+    margin: 0px 0px;
+  }
 }
 
 </style>
