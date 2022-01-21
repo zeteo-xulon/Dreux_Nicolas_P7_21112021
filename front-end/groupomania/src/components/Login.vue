@@ -30,18 +30,15 @@ export default {
 
       axios.post(server + '/login', { ...login })
       .then((res) => {
-        if(res.status !== 200){ alert('Les identifiants sont incorrects') }
-        if(res.status == 200){
           let userLocal = { id: res.data.id, token: res.data.token };
           let b = JSON.stringify(userLocal)
           localStorage.setItem('user', b)
-
-         return this.$router.push({ path: '/profile' });
-        }
-
-
+         return this.$router.push({ path: `/profile/${userLocal.id}`});
     })
-    .catch(err => console.log(err))
+    .catch((err) => {
+      alert('Les identifiants sont incorrects');
+      console.log(err);
+      })
     }
   }
 }

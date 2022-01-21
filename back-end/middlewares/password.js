@@ -4,7 +4,7 @@ const passwordSchema = new passwordValidator();
 
 // Schema for password validation
 passwordSchema
-.is().min(5)                                    // Minimum length 5
+.is().min(8)                                    // Minimum length 8
 .is().max(100)                                  // Maximum length 100
 .has().uppercase()                              // Must have uppercase letters
 .has().lowercase()                              // Must have lowercase letters

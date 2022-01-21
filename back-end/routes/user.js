@@ -6,6 +6,7 @@ const multer = require('../middlewares/multer-config');
 const role = require('../middlewares/role');
 
 router.post('/signup', userCtrl.signup);
+router.get('/verify-user', auth, role, userCtrl.verify);
 router.get('/profile/:id', userCtrl.read);
 router.post('/login', userCtrl.login);
 router.put('/profile/:id', auth, role, userCtrl.update);
