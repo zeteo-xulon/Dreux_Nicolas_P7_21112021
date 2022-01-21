@@ -2,16 +2,16 @@
   <div class="signup">
 
     <div class="form">
-      <label for="firstname">Prénom :</label>
+      <label for="firstname">Prénom : <span class="optionnal">(Optionnel)</span></label>
       <input type="text" name="firstname" id="firstname">
-      <label for="lastname">Nom :</label>
+      <label for="lastname">Nom : <span class="optionnal">(Optionnel)</span></label>
       <input type="text" name="lastname" id="lastname">
       <label for="email">Adresse email :</label>
       <input type="email" name="email" id="email">
       <label for="password">Mot de passe :</label>
       <input type="password" name="password" id="password">
     </div>
-    <input type="submit" value="submit" id="signupSubmitButton" @click="signupSubmit">
+    <button type="submit" value="submit" id="signupSubmitButton" @click="signupSubmit">S'inscrire</button>
   </div>
 </template>
 
@@ -72,5 +72,8 @@ export default {
   border: 3px solid $secondary-color;
   border-radius: 10px;
   padding: 0rem .5rem 1rem .5rem;
+}
+.optionnal{
+  font-style: italic;
 }
 </style>

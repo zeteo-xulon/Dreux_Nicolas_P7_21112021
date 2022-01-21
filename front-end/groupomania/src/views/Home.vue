@@ -7,30 +7,28 @@
         <!-- <router-link to="/signup">Signup</router-link> | -->
         
       </div>
-      <transition name="fade">
+      <transition name="fade-to-top">
         <MainText 
         v-if="!signUpClick && !logInClick" 
         msg="Bienvenue sur le portail social Groupomania." 
         test="Ce site est un réseau social privé à l'entreprise groupomania." />
       </transition>
                   
-      <button class="btn__signup" @click=" signUpClick = !signUpClick ">SIGN UP</button>
-      <button class="btn__signup" @click=" logInClick = !logInClick  ">LOG IN</button>
-      <transition name="fade">
-       <Signup v-if="signUpClick && !logInClick" />
+      <button class="btn__signup" @click=" displaySignUp ">SIGN UP</button>
+      <button class="btn__signup" @click=" displayLogin  ">LOG IN</button>
+      <transition name="fade-to-top">
+       <Signup v-if="signUpClick" />
       </transition>
-      <transition name="fade">
-        <Login v-if="logInClick && !signUpClick" />
+      <transition name="fade-to-top">
+        <Login v-if="logInClick" />
       </transition>
 
-      
     </main>
 
     <Foot />
 
   </div>
 </template>
-
 
 
 <script>
@@ -56,12 +54,28 @@ export default {
     }
   },
   methods: {
-
+    displaySignUp(){
+      if(!this.signUpClick){
+        this.signUpClick = true;
+        return this.logInClick = false;
+      } else {
+        this.signUpClick = false;
+        return this.logInClick = false;
+      }
+    },
+    displayLogin(){
+      if(!this.logInClick){
+        this.logInClick = true;
+        return this.signUpClick = false;
+      } else {
+        this.signUpClick = false;
+        return this.logInClick = false;
+      }
+    }
   }
   
 }
 </script>
-
 
 
 
@@ -104,19 +118,25 @@ img{
 
 
 /*========== ANIMATION  ==========*/
-.fade-enter-active, .fade-leave-active {
-  transition: all .5s;
+/* ________ TOP _________ */
+.fade-to-top-enter-active, .fade-to-top-leave-active {
+  transition: all .5s ease-in-out;
 }
-.fade-enter-from /* .fade-leave-active below version 2.1.8 */ {
+.fade-to-top-enter-from{
   opacity: 0;
+  transform: translateY(-2rem);
 }
-.fade-enter-to{
+.fade-to-top-enter-to{
   opacity: 1;
+  transform: translateY(0rem);
 }
-.fade-leave-from{
+.fade-to-top-leave-from{
   opacity: 1;
+  transform: translateY(0rem);
 }
-.fade-leave-to{
+.fade-to-top-leave-to{
   opacity: 0;
+  transform: translateY(-2rem);
 }
+
 </style>
