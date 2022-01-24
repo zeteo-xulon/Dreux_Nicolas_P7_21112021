@@ -15,7 +15,7 @@ module.exports = (sequelize, Datatypes) => {
       allowNull: false
     },
     media: {
-      type : Datatypes.BLOB,
+      type : Datatypes.STRING,
       allowNull: true
     }
   }, { timestamps : true });

@@ -28,7 +28,8 @@ export default {
       return this.$router.push({ path: '../views/forum'})
     },
     goToProfile(){
-      return this.$router.push({ path: '../views/profile'})
+      let a = JSON.parse(localStorage.getItem('user'));
+      return this.$router.push({ path: '/profile/' + a.id })
     },
     logout(){
       localStorage.removeItem('user')

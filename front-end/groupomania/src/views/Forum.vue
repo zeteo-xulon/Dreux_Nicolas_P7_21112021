@@ -36,7 +36,7 @@ export default {
       
     }
   },
-  components: { Header, NewPost, Foot, Post },
+  components: { Header, NewPost, Post, Foot },
   methods: {
 
     getPost(){
