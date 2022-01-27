@@ -13,6 +13,7 @@
         </textarea>
       </div>
       <input type="file" @click="addImage">
+      <input type="text" id="mediaDescription" placeholder="Décrivez l'image en quelques mots."/>
       <button @click.prevent="submitPost">Créer un nouveau post</button>
     </form>
   
@@ -27,21 +28,32 @@ export default {
   name: 'NewPost',
   data(){
     return {
-      postText: "",
       postTitle: "",
-      url:"http://localhost:3000/forum"
+      postText: "",
+      url:"http://localhost:3000/forum/create/"
     }
   },
   methods: {
     addImage(){
 
     },
-    submitPost(){
-      let localUser = JSON.parse(localStorage.getItem('user'));
-      let user = { id: localUser.id, token: localUser.token, title: this.postTitle, body: this.postText }
+    submitPost(event){
+      let user = JSON.parse(localStorage.getItem('user'));
+      const image = event.target.form[2].files[0];
+      const imageAlt = document.getElementById('mediaDescription').value;
+      let formData = new FormData();
+      if(image){
+       formData.append('image', image);
+       if(imageAlt){ formData.append('media_description', imageAlt) }
+      }
+      formData.append('title', this.postTitle);
+      formData.append('text', this.postText);
+      let config = {
+        headers: { 'Authorization': user.token },
+      }
 
-      axios.post(this.url + '/create/' + user.id, { ...user })
-        .then()
+      axios.post(this.url + user.id, formData, config)
+        .then(() => console.log('its done'))
         .catch(err => console.log(err))
     }
   }
@@ -51,7 +63,11 @@ export default {
 /<style lang="scss" scoped>
 @import '../assets/scss/main.scss';
 
-
+.new-post {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
 .new-post__form{
   @include center;
   flex-flow: column nowrap;
@@ -59,6 +75,8 @@ export default {
   border: 1px solid $primary-color;
   border-radius: 10px;
   padding: 1rem;
+  width: 100%;
+  max-width: 800px;
   & .form__input__container{
     display: flex;
     align-items: flex-start;
@@ -78,5 +96,11 @@ export default {
 .form__title{
       font-weight: bold;
       font-size: 1.2rem;
-    }
+}
+input[type="file"] {
+  width: 100%;
+}
+#mediaDescription {
+    width: 100%;
+}
 </style>

@@ -6,8 +6,8 @@
       <NewPost />
       <Post v-for="post in posts"
       :postTitle= "post.title"
-      :postText= "post.body"
-      :postImage= "post.image"
+      :postText= "post.text"
+      :postImage= "post.media"
       :postAlt= "post.alt"
       :creator= "post.creator_id"
       :creationDate = "post.createdAt"
@@ -59,5 +59,9 @@ export default {
 </script>
 
 <style lang="scss">
-
+.forum{
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+}
 </style>

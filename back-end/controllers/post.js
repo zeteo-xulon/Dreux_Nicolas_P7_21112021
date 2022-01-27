@@ -2,28 +2,31 @@ const fs = require('fs');
 const db = require("../models");
 const Post = db.post;
 
-
+// Create new post
 exports.createPost = (req, res, next) => {
-
-	console.log(req.body)
-  console.log(req.token)
-	
-    Post.create({ 
-      title: req.body.title,
-      body: req.body.body,
-      media: req.body.media,
-      creator_id: req.token
-     })
-    .then(() => res.status(201).json({ message: "Post Créé." }))
-    .catch((error) => res.status(400).json({ error }));
+  let media = "";
+  let alt = "L'utilisateur n'a pas fourni de description à cette image."
+  if(req.file){ 
+    media = `${req.protocol}://${req.get("host")}/images/${ req.file.filename }`;
+    if(req.file.mediaDescription){
+    alt = req.file.mediaDescription;
+    }
+  }
+  Post.create({ 
+    title: req.body.title,
+    text: req.body.text,
+    media: media,
+    media_description: alt,
+    creator_id: req.token
+    })
+  .then(() => res.status(201).json({ message: "Post Créé." }))
+  .catch((error) => res.status(400).json({ error }));
 };
 
+// will send all the existing post
 exports.readPost = (req, res, next) => {
   Post.findAll()
-  .then((e) => {
-
-    res.status(200).json(e)
-  })
+  .then((e) => { res.status(200).json(e) })
   .catch((error) => res.status(400).json({ error }));
 }
 

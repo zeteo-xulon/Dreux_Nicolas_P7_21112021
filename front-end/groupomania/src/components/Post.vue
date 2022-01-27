@@ -1,6 +1,7 @@
 <template>
   <article class="post">
     <div class="post__info">
+      <img class="post__info__user-avatar" :src="postCreatorAvatar" alt="Avatar de l'utilisateur" />
       <p class="post__creator">{{ postCreator }}</p>
       <p class="post__date-created">{{ creationDate }}</p>
     </div>
@@ -20,6 +21,7 @@ export default {
   data(){
     return {
       postCreator: "",
+      postCreatorAvatar: "",
       postCreated: ""
     }
   },
@@ -35,8 +37,10 @@ export default {
     getUserInfo(){
       axios.get('http://localhost:3000/profile/' + this.creator)
       .then((res) => {
-        console.log(res)
-        this.postCreator = res.data.firstname + " " + res.data.lastname;
+        console.log(res.data.dataValues)
+        let user = res.data.dataValues;
+        this.postCreator = user.firstname + " " + user.lastname;
+        this.postCreatorAvatar = user.avatar;
       })
       .catch(err => console.log(err))
     }
@@ -56,7 +60,38 @@ export default {
   border: 1px solid $primary-color;
   border-radius: 10px;
   margin: .5rem 0px;
- 
+  & .post__info {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    & .post__info__user-avatar{
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border: 1px solid $primary-color;
+      border-radius: 50%;
+      margin-left: 10px;
+    }
+  & p.post__creator {
+    font-weight: bold;
+    font-size: 1rem;
+    width: 40%;
+    }
+  & p.post__date-created {
+    width: 25%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+  }
+  & .post__container__image{
+    & .post__image{
+      max-width: 750px;
+      max-height: 400px;
+      object-fit: contain;
+    }
+  }
 }
 
 </style>

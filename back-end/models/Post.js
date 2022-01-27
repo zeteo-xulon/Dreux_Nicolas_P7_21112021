@@ -10,11 +10,15 @@ module.exports = (sequelize, Datatypes) => {
       type: Datatypes.STRING,
       allowNull: false,
     },
-    body: {
+    text: {
       type: Datatypes.TEXT,
       allowNull: false
     },
     media: {
+      type : Datatypes.STRING,
+      allowNull: true
+    },
+    media_description: {
       type : Datatypes.STRING,
       allowNull: true
     }
