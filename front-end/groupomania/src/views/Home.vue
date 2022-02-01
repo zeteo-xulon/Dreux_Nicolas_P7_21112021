@@ -90,6 +90,8 @@ export default {
 
 button {
   font-weight: bold;
+  font-size: clamp(10px, 70%, 2rem);
+  width: clamp(60px, 100%, 200px);
   color: $tertiary-color;
   background: $primary-color;
   padding: .5rem;

@@ -31,10 +31,16 @@ exports.readPost = (req, res, next) => {
 }
 
 exports.updatePost = (req, res, next) => {
-  Post.update( { _id: req.params.id }, { ...req.body, _id: req.params.id } )
+
+  if(req.file){
+    fs.unlink()
+  }else {
+    Post.update( { _id: req.params.id }, { ...req.body, _id: req.params.id } )
 		.then(() =>	{ res.status(200).json({ message: "Post updated successfully!" })})
 		.catch((error) => res.status(400).json({ error }))
-}
+    }
+  }
+
 
 exports.deletePost = (req, res, next) => {
   let userId = req.body.id;

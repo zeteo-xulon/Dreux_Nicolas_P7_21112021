@@ -10,19 +10,44 @@
     <div class="post__container__image">
       <img class="post__image" :src="postImage" :alt="postAlt" />
     </div>
+
+    <UpdatePost v-if="displayPostUpdateContainer" class="post__update__component" 
+      :originalTitle= "this.postTitle"
+      :originalText= "this.postText"
+      :originalMedia= "this.postImage"
+      :originalAlt= "this.postAlt"
+      :postCreator= "this.postCreatorId"
+    />
+
+    <div v-if="visitorCanUpdateOrDelete" class="post__btn-container">
+      <button @click.prevent="displayPostUpdate" class="post__btn__update" id="postUpdateBtn">Modifier</button>
+      <button @click="postDelete" class="post__btn__delete" id="postDeleteBtn">Supprimer</button>
+    </div>
+    
+    <div class="post__btn-container">
+      <button class="post__btn__comment" id="postCommentBtn">Commenter</button>
+    </div>
+
   </article>
 </template>
 
 <script>
 const axios = require('axios');
+import UpdatePost from '@/components/UpdatePost.vue';
 
 export default {
   name: 'Post',
+  components: {
+    UpdatePost
+  },
   data(){
     return {
       postCreator: "",
       postCreatorAvatar: "",
-      postCreated: ""
+      postCreated: "",
+      postCreatorId: this.creator,
+      visitorCanUpdateOrDelete: false,
+      displayPostUpdateContainer: false
     }
   },
   props: {
@@ -31,9 +56,16 @@ export default {
     postImage: String,
     postAlt: String,
     creator: Number,
-    creationDate: String
+    creationDate: String,
+    visitorId: Number,
+    visitorRole: Number
   },
   methods: {
+        checkUserHabilities(){
+      if(this.visitorId === this.postCreatorId || this.visitorRole === 2){
+          this.visitorCanUpdateOrDelete = true;
+      }
+    },
     getUserInfo(){
       axios.get('http://localhost:3000/profile/' + this.creator)
       .then((res) => {
@@ -41,12 +73,21 @@ export default {
         let user = res.data.dataValues;
         this.postCreator = user.firstname + " " + user.lastname;
         this.postCreatorAvatar = user.avatar;
+      
       })
       .catch(err => console.log(err))
+    },
+    displayPostUpdate(){
+      let buttonText = document.getElementById('postUpdateBtn');
+      !this.displayPostUpdateContainer ? (this.displayPostUpdateContainer = true, buttonText.innerText = "Annuler") : (this.displayPostUpdateContainer = false, buttonText.innerText = "Modifier");
+    },
+    postDelete(){
+
     }
   },
-  mounted(){
-    this.getUserInfo()
+  mounted(){ 
+    this.getUserInfo();
+    this.checkUserHabilities();
   }
 }
 </script>
@@ -92,6 +133,12 @@ export default {
       object-fit: contain;
     }
   }
+}
+.post__btn-container{
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-evenly;
+  padding: 0.3rem 0rem 0.8rem 0rem;
 }
 
 </style>

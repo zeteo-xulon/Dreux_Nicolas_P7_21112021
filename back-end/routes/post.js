@@ -6,7 +6,7 @@ const multer = require('../middlewares/multer-config');
 
 router.post('/forum/create/:id', auth, multer, postCtrl.createPost);
 router.get('/forum', postCtrl.readPost);
-router.put('/forum/update', auth, multer, postCtrl.updatePost);
-router.delete('/forum/delete', auth, multer, postCtrl.deletePost);
+router.put('/forum/update/:id', auth, multer, postCtrl.updatePost);
+router.delete('/forum/delete/:id', auth, multer, postCtrl.deletePost);
 
 module.exports = router;

@@ -11,6 +11,8 @@
       :postAlt= "post.alt"
       :creator= "post.creator_id"
       :creationDate = "post.createdAt"
+      :visitorId= "visitor.id"
+      :visitorRole= "visitor.role"
       :key= "post.id"
       />
     </section>
@@ -33,18 +35,26 @@ export default {
   data(){
     return {
       posts: [],
-      
+      visitor: {}
     }
   },
   components: { Header, NewPost, Post, Foot },
   methods: {
-
+    verifyUser(){
+    let visitor = JSON.parse(localStorage.getItem('user'));
+    let config = {  headers: {"Authorization": visitor.token} }
+    axios.get("http://localhost:3000/verify-user", config)
+    .then((e) => {
+      this.visitor = e.data.user;
+    })
+    .catch(err => console.log(err))
+    },
     getPost(){
       const forumUrl = server + "/forum";
       axios.get(forumUrl)
       .then((res) => {
         for(let i = 0; i < res.data.length; i++){
-          this.posts.push(res.data[i]);
+          this.posts.unshift(res.data[i]);
         }
         console.log(res)})
       .catch(err => console.log(err))
@@ -52,7 +62,8 @@ export default {
 
   },
   beforeMount(){
-      this.getPost()
+    this.verifyUser();
+    this.getPost();
   }
 }
 
