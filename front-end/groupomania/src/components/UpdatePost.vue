@@ -37,6 +37,7 @@ export default {
     }
   },
   props: {
+    originalId: Number,
     originalTitle: String,
     originalText: String,
     originalMedia: String,
@@ -47,27 +48,29 @@ export default {
 
     submitUpdatedPost(event){
       let user = JSON.parse(localStorage.getItem('user'));
-      console.log(event);
-      console.log(event.target.form[2].files[0]);
-
+      let config = { headers: { 'Authorization': user.token } }
       const image = event.target.form[2].files[0];
-      const imageAlt = document.getElementById('mediaDescription').value;
+      const imageAlt = event.target.form[3].value;
       const title = document.getElementById('updateFormTitle').value;
       const text = document.getElementById('updatePostTextarea').value;
 
       let formData = new FormData();
-      if(image){
-       formData.append('image', image);
-       if(imageAlt){ formData.append('media_description', imageAlt) }
-       }
-      if(this.originalTitle != title){ formData.append('updatedTitle', title) }
-      if(this.originalText != text){ formData.append('updatedText', text) }
-
-      let config = {
-        headers: { 'Authorization': user.token },
+      formData.append('postId', this.originalId);
+      if(this.originalTitle != title){ formData.append('title', title) }
+      if(this.originalText != text){ formData.append('text', text) }
+       if(image){
+        formData.append('image', image);
+        if(imageAlt){ formData.append('media_description', imageAlt) }
       }
-      axios.update(this.url + this.postCreator, formData, config)
-        .then(() => console.log('its done'))
+      if(this.originalText == text && this.originalTitle == title && !image){
+        return alert("Vous n'avez entré aucune modification.");
+      }
+      
+      axios.put(this.url + this.postCreator, formData, config)
+        .then(() => {
+          console.log('its done');
+          return this.$emit('reloadComponent');
+          })
         .catch(err => console.log(err))
     }
   }

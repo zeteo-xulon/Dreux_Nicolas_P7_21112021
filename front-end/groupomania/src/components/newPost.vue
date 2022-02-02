@@ -1,6 +1,5 @@
 <template>
   <section class="new-post">
-
     <form class="new-post__form">
       <div class="form__input__container">
         <label class="form__title" for="post">Titre :</label>
@@ -12,18 +11,15 @@
         <textarea class="form__text" rows="5" cols="20" v-model="postText">
         </textarea>
       </div>
-      <input type="file" @click="addImage">
+      <input type="file">
       <input type="text" id="mediaDescription" placeholder="Décrivez l'image en quelques mots."/>
       <button @click.prevent="submitPost">Créer un nouveau post</button>
     </form>
-  
   </section>
 </template>
 
-
 <script>
 const axios = require('axios');
-
 export default {
   name: 'NewPost',
   data(){
@@ -34,9 +30,6 @@ export default {
     }
   },
   methods: {
-    addImage(){
-
-    },
     submitPost(event){
       let user = JSON.parse(localStorage.getItem('user'));
       const image = event.target.form[2].files[0];
@@ -51,9 +44,11 @@ export default {
       let config = {
         headers: { 'Authorization': user.token },
       }
-
       axios.post(this.url + user.id, formData, config)
-        .then(() => console.log('its done'))
+        .then(() => {
+          console.log('its done');
+          this.$parent.refreshView++
+          })
         .catch(err => console.log(err))
     }
   }

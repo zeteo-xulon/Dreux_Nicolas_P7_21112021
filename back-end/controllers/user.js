@@ -107,7 +107,6 @@ exports.updateProfileImage = (req, res, next) => {
 	.then((e) => {
 		const avatar = `${req.protocol}://${req.get("host")}/images/${ req.file.filename }`;
 		if(e.avatar !== "http://localhost:3000/images/default-avatar.jpg"){
-			console.log('Avatar autre que celui par default');
 			const imageName = e.avatar.split("/images/")[1];
 			fs.unlink(`images/${imageName}`, () =>{
 				User.update({ avatar: avatar }, { where: { id: req.token }})
@@ -115,7 +114,6 @@ exports.updateProfileImage = (req, res, next) => {
 				.catch((err) => res.status(400).json({ err, message: "L'Avatar n'as pas pu êter modifié." }))	
 			})
 		} else {
-			console.log('Avatar par default');
 			User.update({ avatar: avatar }, { where: { id: req.token }})
 			.then(() => res.status(201).json({ message: "Avatar modifié." }))
 			.catch((err) => res.status(400).json({ err, message: "L'Avatar n'as pas pu être modifié." }))	

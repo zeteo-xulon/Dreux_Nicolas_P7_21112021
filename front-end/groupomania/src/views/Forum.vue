@@ -3,12 +3,13 @@
     <Header />
     
     <section class="forum">
-      <NewPost />
+      <NewPost ref="refreshView" :key= "refreshView" />
       <Post v-for="post in posts"
+      :postId= "post.id"
       :postTitle= "post.title"
       :postText= "post.text"
       :postImage= "post.media"
-      :postAlt= "post.alt"
+      :postAlt= "post.media_description"
       :creator= "post.creator_id"
       :creationDate = "post.createdAt"
       :visitorId= "visitor.id"
@@ -35,19 +36,20 @@ export default {
   data(){
     return {
       posts: [],
-      visitor: {}
+      visitor: {},
+      refreshView: 1
     }
   },
   components: { Header, NewPost, Post, Foot },
   methods: {
     verifyUser(){
-    let visitor = JSON.parse(localStorage.getItem('user'));
-    let config = {  headers: {"Authorization": visitor.token} }
-    axios.get("http://localhost:3000/verify-user", config)
-    .then((e) => {
-      this.visitor = e.data.user;
-    })
-    .catch(err => console.log(err))
+      let visitor = JSON.parse(localStorage.getItem('user'));
+      let config = {  headers: {"Authorization": visitor.token} }
+      axios.get("http://localhost:3000/verify-user", config)
+      .then((e) => {
+        this.visitor = e.data.user;
+      })
+      .catch(err => console.log(err))
     },
     getPost(){
       const forumUrl = server + "/forum";
@@ -55,16 +57,23 @@ export default {
       .then((res) => {
         for(let i = 0; i < res.data.length; i++){
           this.posts.unshift(res.data[i]);
-        }
-        console.log(res)})
+        }})
       .catch(err => console.log(err))
     }
-
+  },
+  watch: {
+    refreshView(newValue, oldValue){
+      if(newValue > oldValue){
+        this.posts = [];
+        this.verifyUser();
+        this.getPost();
+      }
+    }
   },
   beforeMount(){
     this.verifyUser();
     this.getPost();
-  }
+  },
 }
 
 </script>

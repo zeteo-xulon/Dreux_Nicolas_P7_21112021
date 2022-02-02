@@ -34,7 +34,8 @@ app.use('', postRoutes);
 
 
 // to auto reset : { force: true }
-db.sequelize.sync({ alter: true })
+// to modify only the specified { alter: true }
+db.sequelize.sync()
 .then(server)
 .catch( err => console.log({err}));
 
