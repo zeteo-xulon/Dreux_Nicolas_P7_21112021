@@ -1,5 +1,6 @@
 <template>
-  <article class="post">
+  <article v-if="!asBeenDeleted" class="post">
+
     <div v-if="!displayPostUpdateContainer" class="post__info__container">
       <div class="post__info">
         <img class="post__info__user-avatar" :src="postCreatorAvatar" alt="Avatar de l'utilisateur" />
@@ -24,23 +25,23 @@
           <textarea class="form__text" rows="5" cols="20" id="updatePostTextarea" :value="post_text">
           </textarea>
         </div>
-        <input type="file">
+        <input type="file" id="updateFileInput" />
         <input type="text" id="mediaDescription" placeholder="Décrivez l'image en quelques mots."/>
         <div class="btn__container">
-          <button @click.prevent="submitUpdatedPost">Soumettre les modifications</button>
+           <font-awesome-icon @click.prevent="submitUpdatedPost" class="awesome__icon" icon="check" />
+           <font-awesome-icon v-show="displayPostUpdateContainer" @click.prevent="displayPostUpdate" class="awesome__icon" icon="ban" />
         </div>
       </form>
     </section>
 
-    <div v-if="visitorCanUpdateOrDelete" class="post__btn-container">
-      <button @click.prevent="displayPostUpdate" class="post__btn__update" id="postUpdateBtn">Modifier</button>
-      <button @click="postDelete" class="post__btn__delete" id="postDeleteBtn">Supprimer</button>
-    </div>
-    
     <div class="post__btn-container">
-      <button class="post__btn__comment" id="postCommentBtn">Commenter</button>
-      <button @click="refreshPost" class="post__btn__comment" id="postRefreshBtn">refresh</button>
+      <font-awesome-icon v-show="!displayPostUpdateContainer" class="awesome__icon" id="postCommentBtn" icon="comment" />
+      <font-awesome-icon v-if="visitorCanUpdateOrDelete" v-show="!displayPostUpdateContainer" @click.prevent="displayPostUpdate" class="awesome__icon" id="postUpdateBtn" icon="edit" />
+      <font-awesome-icon v-if="visitorCanUpdateOrDelete" v-show="!displayPostUpdateContainer" @click.prevent="postDelete" class="awesome__icon" id="postDeleteBtn" icon="trash" />
     </div>
+
+<!-- <NewComment > -->
+<!-- Comment v-for="comment in comments"  -->
 
   </article>
 </template>
@@ -62,7 +63,8 @@ export default {
       postCreated: "",
       postCreatorId: "",
       visitorCanUpdateOrDelete: false,
-      displayPostUpdateContainer: false
+      displayPostUpdateContainer: false,
+      asBeenDeleted: false
     }
   },
   props: {
@@ -92,21 +94,25 @@ export default {
       .catch(err => console.log(err))
     },
     displayPostUpdate(){
-      let buttonText = document.getElementById('postUpdateBtn');
-      !this.displayPostUpdateContainer ? (this.displayPostUpdateContainer = true, buttonText.innerText = "Annuler") : (this.displayPostUpdateContainer = false, buttonText.innerText = "Modifier");
+      !this.displayPostUpdateContainer ? this.displayPostUpdateContainer = true : this.displayPostUpdateContainer = false;
     },
     postDelete(){
-      
+      let user = JSON.parse(localStorage.getItem('user'));
+      let config = { headers: { 'Authorization' : user.token } };
+      let route = `http://localhost:3000/forum/delete/${this.post_id}`;
+      axios.delete(route, config)
+      .then(() => {
+        this.asBeenDeleted = true;
+        alert('Post supprimé avec succès');
+        })
+      .catch(err => console.log(err))
     },
-    reloadComponent(){
-      this.$forceUpdate()
-    },
-    submitUpdatedPost(event){
+    submitUpdatedPost(){
       let updateUrl = "http://localhost:3000/forum/update/";
       let user = JSON.parse(localStorage.getItem('user'));
       let config = { headers: { 'Authorization': user.token } }
-      const image = event.target.form[2].files[0];
-      const imageAlt = event.target.form[3].value;
+      const image = document.getElementById('updateFileInput').files[0];
+      const imageAlt = document.getElementById('mediaDescription').value;
       const title = document.getElementById('updateFormTitle').value;
       const text = document.getElementById('updatePostTextarea').value;
 
@@ -135,7 +141,6 @@ export default {
     refreshPost(){
       axios.get("http://localhost:3000/forum/reload/post/" + this.post_id)
       .then((e) => {
-        console.log(e.data[0]);
         this.post_title = e.data[0].title;
         this.post_text = e.data[0].text;
         this.post_image = e.data[0].media;
@@ -212,7 +217,12 @@ export default {
   justify-content: space-evenly;
   padding: 0.3rem 0rem 0.8rem 0rem;
 }
-
+.btn__container{
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-evenly;
+}
 .update-post {
   display: flex;
   justify-content: center;
@@ -251,5 +261,32 @@ input[type="file"] {
 }
 #mediaDescription {
     width: 100%;
+}
+.awesome__icon{
+  color: $primary-color;
+  font-weight: bold;
+  font-size: 1rem;
+  height: 2.5rem;
+  width: 2.5rem;
+  padding: 5px;
+  border: 4px solid #f72d02;
+  border-radius: 10px;
+  cursor: pointer;
+  transition:all .3s;
+  &:hover{
+    color: $primary-color;
+    transform: scale(1.1, 1.1);
+    border: 3px solid $primary-color;
+  }
+  &:active{
+  color: $primary-color;
+  transform: scale(.8, .8);
+  border: 2px solid $primary-color;
+  }
+  &:focus{
+    color: black;
+    transform: scale(.9, .9);
+    border: 2px solid black;
+  }
 }
 </style>

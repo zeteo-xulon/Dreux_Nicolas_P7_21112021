@@ -6,9 +6,6 @@
       <p class="comment__date-created">{{ creationDate }}</p>
     </div>
     <p class="comment__text">{{ commentText }}</p>
-    <div class="comment__container__image">
-      <img class="comment__image" :src="commentImage" :alt="commentAlt" />
-    </div>
   </article>
 </template>
 
@@ -18,7 +15,7 @@
 const axios = require('axios');
 
 export default {
-  name: 'Post',
+  name: 'NewComment',
   data(){
     return {
       commentCreator: "",
@@ -28,8 +25,6 @@ export default {
   },
   props: {
     commentText: String,
-    commentImage: String,
-    commentAlt: String,
     creator: Number,
     creationDate: String
   },
@@ -39,8 +34,8 @@ export default {
       .then((res) => {
         console.log(res.data.dataValues)
         let user = res.data.dataValues;
-        this.postCreator = user.firstname + " " + user.lastname;
-        this.postCreatorAvatar = user.avatar;
+        this.commentCreator = user.firstname + " " + user.lastname;
+        this.commentCreatorAvatar = user.avatar;
       })
       .catch(err => console.log(err))
     }

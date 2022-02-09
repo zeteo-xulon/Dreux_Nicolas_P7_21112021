@@ -10,7 +10,7 @@ const server = require('./server');
 const path = require('path');
 const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
-// const commentRoutes = require('./routes/comment');
+const commentRoutes = require('./routes/comment');
 
 /*----------------------------------------------------------------
 													USE
@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('', userRoutes);
 app.use('', postRoutes);
-// app.use('', commentRoutes);
+app.use('', commentRoutes);
 
 
 // to auto reset : { force: true }

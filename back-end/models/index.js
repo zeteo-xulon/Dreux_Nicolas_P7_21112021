@@ -55,11 +55,11 @@ db.user.hasOne(db.role);
 db.role.belongsTo(db.user, { foreignKey: "role_id", onDelete:"NO ACTION", setDefault: 1 });
 
 //post
-db.post.hasMany(db.comment, { foreignKey: "comments_id", onDelete: "CASCADE" });
+db.post.hasMany(db.comment, { foreignKey: "post_id", onDelete: "CASCADE" });
 
 db.post.belongsTo(db.user);
 //comment
-db.comments.belongsTo(db.post, { foreignKey: "post_id", onDelete:"NO ACTION" });
+db.comments.belongsTo(db.post);
 db.comments.belongsTo(db.user);
 
 

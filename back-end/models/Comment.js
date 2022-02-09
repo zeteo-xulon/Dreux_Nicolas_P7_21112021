@@ -6,13 +6,9 @@ module.exports = (sequelize, Datatypes) => {
       autoIncrement: true,
       primaryKey: true
     },
-    body: {
+    text: {
       type: Datatypes.TEXT,
       allowNull: false
-    },
-    media: {
-      type : Datatypes.STRING,
-      allowNull: true
     }
   }, { timestamps : true });
 
