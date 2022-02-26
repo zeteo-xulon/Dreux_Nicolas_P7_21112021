@@ -38,7 +38,6 @@ import Signup from '@/components/Signup.vue';
 import Login from '@/components/Login.vue';
 import Foot from '@/components/Foot.vue';
 
-
 export default {
   name: 'Home',
   components: {
@@ -71,15 +70,21 @@ export default {
         this.signUpClick = false;
         return this.logInClick = false;
       }
+    },
+    checkLocalStorage(){
+      let user = JSON.parse(localStorage.getItem('user'));
+      if(user) { return this.$router.push({ path: `/forum` }) }
     }
+  },
+  beforeMount(){
+    this.checkLocalStorage()
   }
-  
 }
 </script>
 
 
-
 <style lang="scss">
+
 @import '../assets/scss/main.scss';
 
 /*============================== 
@@ -91,11 +96,11 @@ export default {
 button {
   font-weight: bold;
   font-size: clamp(10px, 70%, 2rem);
-  width: clamp(60px, 100%, 200px);
+  width: clamp(50px, 100%, 30vw);
   color: $tertiary-color;
   background: $primary-color;
   padding: .5rem;
-  margin: 0rem .5rem 0rem .5rem;
+  margin: 5px .5rem;
   border: 0px solid black;
   border-radius: 10px;
   cursor: pointer;

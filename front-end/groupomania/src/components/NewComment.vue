@@ -1,12 +1,11 @@
 <template>
-  <article class="comment">
-    <div class="comment__info">
-      <img class="comment__info__user-avatar" :src="commentCreatorAvatar" alt="Avatar de l'utilisateur" />
-      <p class="comment__creator">{{ commentCreator }}</p>
-      <p class="comment__date-created">{{ creationDate }}</p>
+  <form class="new-comment">
+    <textarea class="new-comment__text" id="newCommentText" type="text" placeholder="Entrez ici votre commentaire." cols="30" rows="5" />
+    <div class="new-comment__button-container">
+      <font-awesome-icon @click.prevent="postNewComment" class="awesome__icon green" icon="check" />
+      <font-awesome-icon  @click.prevent="closeNewComment" class="awesome__icon" icon="ban" />
     </div>
-    <p class="comment__text">{{ commentText }}</p>
-  </article>
+  </form>
 </template>
 
 
@@ -16,32 +15,44 @@ const axios = require('axios');
 
 export default {
   name: 'NewComment',
-  data(){
-    return {
-      commentCreator: "",
-      commentCreatorAvatar: "",
-      commentCreated: ""
-    }
-  },
-  props: {
-    commentText: String,
-    creator: Number,
-    creationDate: String
-  },
+  data(){ return { post_id: "" }},
+  props: { postId: Number },
   methods: {
-    getUserInfo(){
-      axios.get('http://localhost:3000/profile/' + this.creator)
-      .then((res) => {
-        console.log(res.data.dataValues)
-        let user = res.data.dataValues;
-        this.commentCreator = user.firstname + " " + user.lastname;
-        this.commentCreatorAvatar = user.avatar;
-      })
+    switchData(){ this.post_id = this.postId },
+
+    postNewComment(){
+      const server = "http://localhost:3000";
+      const user = JSON.parse(localStorage.getItem('user'));
+      const config = { headers: { Authorization: user.token } };
+      const call = server + "/forum/comment/create/" + this.post_id;
+      const comment = { text: document.getElementById('newCommentText').value };
+      if(!comment.text) { return alert("vous écrire quelque chose avant d'envoyer votre commentaire")}
+
+      axios.post(call, comment, config)
+      .then(() => {
+        document.getElementById('newCommentText').value = "";
+        this.$parent.refreshComponent++;
+        })
       .catch(err => console.log(err))
-    }
+    },
+
+    closeNewComment(){ this.$parent.displayNewComment = false },
   },
-  mounted(){
-    this.getUserInfo()
-  }
+  beforeMount(){ this.switchData() }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../assets/scss/main.scss';
+.new-comment{
+  width: clamp(100px, 100%, 800px);
+  padding: 5px;
+  margin: 5px;
+  border: 1px solid $generic-gradient-primary-color;
+  border-radius: 5px;
+  &__text{
+    font-size: 1rem;
+    width: 100%;
+  }
+}
+</style>

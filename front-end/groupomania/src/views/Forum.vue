@@ -10,10 +10,11 @@
       :postText= "post.text"
       :postImage= "post.media"
       :postAlt= "post.media_description"
-      :creator= "post.creator_id"
+      :creator= "post.user"
       :creationDate = "post.createdAt"
       :visitorId= "visitor.id"
       :visitorRole= "visitor.role"
+      :comments= "post.comments"
       :key= "post.id"
       />
     </section>
@@ -23,13 +24,12 @@
 </template>
 
 <script>
-  const axios = require('axios');
-  const server = 'http://localhost:3000';
+const axios = require('axios');
 
-  import Header from '@/components/Header.vue';
-  import Foot from '@/components/Foot.vue';
-  import NewPost from '@/components/NewPost.vue';
-  import Post from '@/components/Post.vue';
+import Header from '@/components/Header.vue';
+import Foot from '@/components/Foot.vue';
+import NewPost from '@/components/NewPost.vue';
+import Post from '@/components/Post.vue';
 
 export default {
   name: 'Forum',
@@ -43,18 +43,22 @@ export default {
   components: { Header, NewPost, Post, Foot },
   methods: {
     verifyUser(){
-      let visitor = JSON.parse(localStorage.getItem('user'));
-      let config = {  headers: {"Authorization": visitor.token} }
+      let user = JSON.parse(localStorage.getItem('user'));
+      let config = {  headers: {"Authorization": user.token} }
       axios.get("http://localhost:3000/verify-user", config)
       .then((e) => {
         this.visitor = e.data.user;
       })
-      .catch(err => console.log(err))
+      .catch((err) => {
+        localStorage.removeItem('user');
+        this.$router.push({ path: '../views/'});
+        return console.log(err)
+        })
     },
     getPost(){
-      const forumUrl = server + "/forum";
-      axios.get(forumUrl)
+      axios.get("http://localhost:3000/forum")
       .then((res) => {
+        console.log(res);
         for(let i = 0; i < res.data.length; i++){
           this.posts.unshift(res.data[i]);
         }})

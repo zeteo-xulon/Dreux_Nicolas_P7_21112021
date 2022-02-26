@@ -3,8 +3,10 @@
 
     <div v-if="!displayPostUpdateContainer" class="post__info__container">
       <div class="post__info">
-        <img class="post__info__user-avatar" :src="postCreatorAvatar" alt="Avatar de l'utilisateur" />
-        <p class="post__creator">{{ postCreator }}</p>
+        <aside class="separation">
+          <img class="post__info__user-avatar" :src="postCreatorAvatar" alt="Avatar de l'utilisateur" />
+          <p class="post__creator">{{ postCreator }}</p>
+        </aside>
         <p class="post__date-created">{{ postCreated }}</p>
       </div>
       <h2 class="post__title">{{ post_title }}</h2>
@@ -35,22 +37,28 @@
     </section>
 
     <div class="post__btn-container">
-      <font-awesome-icon v-show="!displayPostUpdateContainer" class="awesome__icon" id="postCommentBtn" icon="comment" />
+      <font-awesome-icon v-show="!displayPostUpdateContainer" @click="displayComments" class="awesome__icon" id="postCommentBtn" icon="comment-dots" />
       <font-awesome-icon v-if="visitorCanUpdateOrDelete" v-show="!displayPostUpdateContainer" @click.prevent="displayPostUpdate" class="awesome__icon" id="postUpdateBtn" icon="edit" />
       <font-awesome-icon v-if="visitorCanUpdateOrDelete" v-show="!displayPostUpdateContainer" @click.prevent="postDelete" class="awesome__icon" id="postDeleteBtn" icon="trash" />
     </div>
 
-<!-- <NewComment > -->
-<!-- Comment v-for="comment in comments"  -->
+    <CommentBox v-if="showCommentBox" 
+    :post_id= "post_id"
+    :visitor_id= "visitor_id"
+    :visitor_role= "visitor_role"
+    :post_comments= "post_comments"
+    />
 
   </article>
 </template>
 
 <script>
 const axios = require('axios');
+import CommentBox from '@/components/CommentBox.vue';
 
 export default {
   name: 'Post',
+  components: { CommentBox },
   data(){
     return {
       post_id: "",
@@ -58,13 +66,17 @@ export default {
       post_text: "",
       post_image: "",
       post_alt: "",
+      post_comments: "",
       postCreator: "",
       postCreatorAvatar: "",
       postCreated: "",
       postCreatorId: "",
+      visitor_id: "",
+      visitor_role: "",
       visitorCanUpdateOrDelete: false,
       displayPostUpdateContainer: false,
-      asBeenDeleted: false
+      asBeenDeleted: false,
+      showCommentBox: false
     }
   },
   props: {
@@ -73,8 +85,9 @@ export default {
     postText: String,
     postImage: String,
     postAlt: String,
-    creator: Number,
+    creator: Object,
     creationDate: String,
+    comments: Array,
     visitorId: Number,
     visitorRole: Number
   },
@@ -84,17 +97,11 @@ export default {
           this.visitorCanUpdateOrDelete = true;
       }
     },
-    getUserInfo(){
-      axios.get('http://localhost:3000/profile/' + this.creator)
-      .then((res) => {
-        let user = res.data.dataValues;
-        this.postCreator = user.firstname + " " + user.lastname;
-        this.postCreatorAvatar = user.avatar;     
-      })
-      .catch(err => console.log(err))
-    },
     displayPostUpdate(){
       !this.displayPostUpdateContainer ? this.displayPostUpdateContainer = true : this.displayPostUpdateContainer = false;
+    },
+    displayComments(){
+      !this.showCommentBox ? this.showCommentBox = true : this.showCommentBox = false;
     },
     postDelete(){
       let user = JSON.parse(localStorage.getItem('user'));
@@ -108,7 +115,6 @@ export default {
       .catch(err => console.log(err))
     },
     submitUpdatedPost(){
-      let updateUrl = "http://localhost:3000/forum/update/";
       let user = JSON.parse(localStorage.getItem('user'));
       let config = { headers: { 'Authorization': user.token } }
       const image = document.getElementById('updateFileInput').files[0];
@@ -120,15 +126,13 @@ export default {
       formData.append('post_id', this.postId);
       if(this.postTitle != title){ formData.append('title', title) }
       if(this.postText != text){ formData.append('text', text) }
-        if(image){
+      if(image){
         formData.append('image', image);
         if(imageAlt){ formData.append('media_description', imageAlt) }
       }
-      if(this.postText == text && this.postTitle == title && !image){
-        return alert("Vous n'avez entré aucune modification.");
-      }
+      if(this.postText == text && this.postTitle == title && !image){ return alert("Vous n'avez entré aucune modification.") }
       
-      axios.put(updateUrl + this.postId, formData, config)
+      axios.put("http://localhost:3000/forum/update/" + this.postId, formData, config)
         .then(() => {
           let buttonText = document.getElementById('postUpdateBtn');
           console.log('its done');
@@ -154,15 +158,17 @@ export default {
       this.post_text = this.postText;
       this.post_image = this.postImage;
       this.post_alt = this.postAlt;
-      this.postCreator = "";
-      this.postCreatorAvatar = "";
+      this.post_comments = this.comments;
+      this.postCreator = this.creator.firstname + " " + this.creator.lastname;
+      this.postCreatorAvatar = this.creator.avatar;
       this.postCreated = this.creationDate;
-      this.postCreatorId = this.creator;
+      this.postCreatorId =this.creator.id;
+      this.visitor_id = this.visitorId;
+      this.visitor_role = this.visitorRole;
     }
   },
-  mounted(){ 
+  beforeMount(){ 
     this.switchToData();
-    this.getUserInfo();
     this.checkUserHabilities();
   }
 }
@@ -180,9 +186,14 @@ export default {
   & .post__info {
     display: flex;
     flex-flow: row nowrap;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     width: 100%;
+    & .separation{
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+    }
     & .post__info__user-avatar{
       width: 60px;
       height: 60px;
@@ -191,12 +202,12 @@ export default {
       border-radius: 50%;
       margin-left: 10px;
     }
-  & p.post__creator {
+  & .post__creator {
     font-weight: bold;
     font-size: 1rem;
     width: 40%;
     }
-  & p.post__date-created {
+  & .post__date-created {
     width: 25%;
     overflow: hidden;
     text-overflow: ellipsis;

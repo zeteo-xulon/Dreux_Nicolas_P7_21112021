@@ -1,5 +1,5 @@
 module.exports = (sequelize, Datatypes) => {
-  const Post = sequelize.define("comments", {
+  const Comment = sequelize.define("comments", {
     id: {
       type: Datatypes.INTEGER,
       allowNull: false,
@@ -12,5 +12,5 @@ module.exports = (sequelize, Datatypes) => {
     }
   }, { timestamps : true });
 
-  return Post;
+  return Comment;
 };

@@ -4,7 +4,7 @@ const postCtrl = require('../controllers/post');
 const auth = require('../middlewares/auth');
 const multer = require('../middlewares/multer-config');
 
-router.post('/forum/create/:id', auth, multer, postCtrl.createPost);
+router.post('/forum/create', auth, multer, postCtrl.createPost);
 router.get('/forum', postCtrl.readAllPost);
 router.get('/forum/reload/post/:id', postCtrl.readOnePost);
 router.put('/forum/update/:id', auth, multer, postCtrl.updatePost);

@@ -7,23 +7,30 @@ module.exports = (sequelize, Datatypes) => {
       primaryKey: true
     },
     email: {
-      type: Datatypes.STRING,
+      type: Datatypes.STRING(120),
       allowNull: false,
       require: true,
+      validate: { 
+        notNull: { msg: "L'adresse email doit contenir au minimum 7 caractères." },
+        notEmpty: { msg: "L'adresse email doit contenir au minimum 7 caractères." },
+        isEmail: { msg: "L'addresse email doit être valide." } 
+      },
       unique: true
     },
     password: {
-      type: Datatypes.STRING,
+      type: Datatypes.STRING(150),
       allowNull: false,
       require: true
     },
     firstname: {
       type : Datatypes.STRING(100),
-      allowNull: true
+      allowNull: false,
+      require: true
     },
     lastname: {
       type : Datatypes.STRING(100),
-      allowNull: true
+      allowNull: false,
+      require: true
     },
     job: {
       type: Datatypes.STRING(100),

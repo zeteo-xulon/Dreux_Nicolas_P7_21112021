@@ -1,6 +1,8 @@
 const fs = require('fs');
 const db = require("../models");
 const Post = db.post;
+const Comment = db.comment;
+const User = db.user;
 
 // Create new post
 exports.createPost = (req, res, next) => {
@@ -11,13 +13,15 @@ exports.createPost = (req, res, next) => {
     if(req.file.mediaDescription){
     alt = req.file.mediaDescription;
     }
+  }else {
+    alt = "";
   }
   Post.create({ 
     title: req.body.title,
     text: req.body.text,
     media: media,
     media_description: alt,
-    creator_id: req.token
+    userId: req.token
     })
   .then(() => res.status(201).json({ message: "Post Créé." }))
   .catch((error) => res.status(400).json({ error }));
@@ -25,7 +29,7 @@ exports.createPost = (req, res, next) => {
 
 // will send all the existing post
 exports.readAllPost = (req, res, next) => {
-  Post.findAll()
+  Post.findAll({ include: [{ model: User }, { model: Comment, include: { model: User } }]})
   .then((e) => { res.status(200).json(e) })
   .catch((error) => res.status(400).json({ error }));
 }
@@ -41,7 +45,7 @@ exports.updatePost = (req, res, next) => {
   Post.findAll({ where: { id: req.params.id } })
   .then((e) => {
     let foundPost = { ...e[0].dataValues };
-    if(req.token === foundPost.creator_id || req.role === 2 ){
+    if(req.token === foundPost.userId || req.role === 2 ){
         if(req.file){
           const newMedia = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
           const previousMedia = foundPost.media.split('/images/')[1];
@@ -75,7 +79,7 @@ exports.deletePost = (req, res, next) => {
   .then((event) => {
     let foundPost = { ...event[0].dataValues };
     //verif user privilege
-    if(req.token === foundPost.creator_id || req.role === 2){
+    if(req.token === foundPost.userId || req.role === 2){
       // Delete the picture if there is one
       if(foundPost.media){
         const mediaToDelete = foundPost.media.split('/images/')[1];

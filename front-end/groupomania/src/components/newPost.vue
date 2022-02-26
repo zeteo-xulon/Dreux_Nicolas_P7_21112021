@@ -25,8 +25,7 @@ export default {
   data(){
     return {
       postTitle: "",
-      postText: "",
-      url:"http://localhost:3000/forum/create/"
+      postText: ""
     }
   },
   methods: {
@@ -44,7 +43,7 @@ export default {
       let config = {
         headers: { 'Authorization': user.token },
       }
-      axios.post(this.url + user.id, formData, config)
+      axios.post("http://localhost:3000/forum/create/", formData, config)
         .then(() => {
           console.log('its done');
           this.$parent.refreshView++

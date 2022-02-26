@@ -31,9 +31,9 @@
           <label for="email">Email :</label>
           <input type="email" :value="profile.email" id="profileEmail">
           <label for="firstname">Prénom :</label>
-          <input type="text" :value="profile.firstname" id="profileFirstname">
+          <input type="text" :value="profile.firstname" id="profileFirstname" />
           <label for="lastname">Nom de famille :</label>
-          <input type="text" :value="profile.lastname" id="profileLastname">
+          <input type="text" :value="profile.lastname" id="profileLastname" />
           <label for="job">Poste :</label>
           <input type="text" :value="profile.job" id="profileJob">
           <label class="bio__label" for="bio">Biographie :</label>
@@ -51,12 +51,12 @@
       <aside v-if="showPasswordUpdateContainer" class="password__container">
           <form class="profile__password">
               <label for="password">Ancien mot de passe :</label>
-              <input id="oldPassword" type="password"  minlength="8">
+              <input id="oldPassword" type="password"  minlength="8" autocomplete="on">
 
               <label for="password">Nouveau mot de passe :</label>
-              <input id="newPassword1" type="password"   minlength="8">
+              <input id="newPassword1" type="password"   minlength="8" autocomplete="on">
               <label for="password">Vérification mot de passe :</label>
-              <input id="newPassword2" type="password"  minlength="8">
+              <input id="newPassword2" type="password"  minlength="8" autocomplete="on">
               <div class="password__btn-container">
                 <button @click="showPasswordContainer" class="profile__return-btn">Annuler</button>
                 <button @click.prevent="updatePassword" class="profile__update-btn">Soumettre</button>
@@ -81,7 +81,7 @@
         <form class="delete__container">
         <p>Veuillez entrer le mot de passe pour supprimer le compte.</p>
         <label for="password">Mot de passe :</label>
-        <input id="deletePassword" type="password" minlength="8">
+        <input id="deletePassword" type="password" minlength="8" autocomplete="off">
         <div class="delete__btn-container">
             <button @click.prevent="displayDeleteContainer" class="profile__return-btn">Annuler</button>
             <button @click.prevent="deleteUser" class="profile__update-btn">Supprimer le compte</button>
@@ -157,7 +157,11 @@
         .then((e) => {
           this.visitor = e.data.user;
         })
-        .catch(err => console.log(err))
+        .catch((err) => {
+          localStorage.removeItem('user');
+          this.$router.push({ path: '../views/'});
+          console.log(err);
+          })
         },
         showPasswordContainer(){
           if(!this.showPasswordUpdateContainer){
@@ -189,14 +193,17 @@
           }
         },
         updateUser(){
-          let user = JSON.parse(localStorage.getItem('user'));
-          let config = { headers: { 'Authorization': user.token }};
+          const user = JSON.parse(localStorage.getItem('user'));
+          const config = { headers: { 'Authorization': user.token }};
 
           let email = document.getElementById('profileEmail').value;
           let firstname = document.getElementById('profileFirstname').value;
           let lastname = document.getElementById('profileLastname').value;
           let job = document.getElementById('profileJob').value;
           let bio = document.getElementById('profileBio').value;
+
+          if(firstname == ""){ return alert("Veuillez remplir la case du prénom.")}
+          if(lastname == ""){ return alert("Veuillez remplir la case du nom.")}
 
           let dataToUpdate = { email: email, firstname: firstname, lastname: lastname, job: job, bio: bio };
 
@@ -248,8 +255,7 @@
           let config = { headers: { 'Authorization': visitor.token }};
 
           axios.put(urlPassword, passwordChangeForm, config)
-          .then((res) => {
-            console.log(res);
+          .then(() => {
             this.getInfo();
             this.displayProfile = true;
             this.showUpdateProfile = false;
@@ -286,15 +292,11 @@
   }
 </script>
 
-
 <style scoped lang="scss">
-
 @import '../assets/scss/main.scss';
-
 /*============================== 
             PROFILE  
 ==============================*/
-
 .container{
   display: flex;
   align-items: center;
@@ -302,7 +304,6 @@
   flex-flow: column nowrap;
   height: 100vh;
 }
-
 .profile{
   border: 3px solid $primary-color;
   @include center;
@@ -317,9 +318,6 @@
     margin: 1rem .5rem;
   }
 }
-
-
-
 .profile__info{
   min-width: 200px;
   width: 90%;
@@ -327,19 +325,16 @@
   flex-flow: column nowrap;
   align-items: center;
 }
-
 input{
   border-radius: 5px;
   box-shadow: inset -3px 1px 3px 0px #cbcbcb;
   width: 100%;
 }
-
 textarea{
   border-radius: 5px;
   box-shadow: inset -3px 1px 3px 0px #cbcbcb;
   width: 100%;
 }
-
 .password__update{
   border-top: 4px double $primary-color;
   width: 100%;
@@ -348,7 +343,6 @@ textarea{
   color: $primary-color;
   cursor: pointer;
 }
-
 .profile__password{
   display: flex;
     flex-direction: column;
@@ -362,7 +356,6 @@ textarea{
     }
     & label{
       font-weight: bold;
-
     }
 }
 .profile__return-btn{
@@ -416,7 +409,6 @@ textarea{
     font-size: .8rem;
   }
 }
-
 form.delete__container {
     padding: 0rem 1rem;
     & p{
@@ -430,6 +422,4 @@ form.delete__container {
       margin: 0.3rem 0rem 1rem 0rem;
     }
 }
-
-
 </style>

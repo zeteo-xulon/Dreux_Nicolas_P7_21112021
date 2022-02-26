@@ -3,32 +3,23 @@
     <label for="email">Adresse email :</label>
     <input type="email" name="email" id="email">
     <label for="password">Mot de passe :</label>
-    <input type="password" name="password" id="password">
+    <input type="password" name="password" id="password" autocomplete="on">
     <button @click.prevent="submitLogin" class="btn__login">Submit</button>
   </form>
-  
-
 </template>
-
 
 
 <script>
 const axios = require('axios');
-const server = 'http://localhost:3000';
-
-
 
 export default {
   name: 'Login',
- 
   methods: {
     submitLogin(){
-      
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       let login = { email: email, password: password };
-
-      axios.post(server + '/login', { ...login })
+      axios.post('http://localhost:3000/login', { ...login })
       .then((res) => {
           let userLocal = { id: res.data.id, token: res.data.token };
           let b = JSON.stringify(userLocal)
@@ -44,11 +35,8 @@ export default {
 }
 </script>
 
-
-
 <style lang="scss">
 @import '../assets/scss/main.scss';
-
 /*============================== 
             LOGIN  
 ==============================*/
@@ -66,6 +54,4 @@ export default {
   min-width: 30%;
   margin: 1.5rem auto 0rem;
 }
-
-
 </style>

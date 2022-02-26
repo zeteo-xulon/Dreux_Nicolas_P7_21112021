@@ -49,7 +49,6 @@ exports.login = (req, res, next) => {
 };
 
 exports.read = (req, res, next) => {
-	console.log('Here is the req.params :' + req.params);
 	User.findOne({ where: { id: req.params.id}})
 	.then((user) => {
 		res.status(200).json({...user});
@@ -128,6 +127,7 @@ exports.updateProfileImage = (req, res, next) => {
 exports.delete = (req, res, next) => {
 	User.findOne({ where: { id: req.body.profileId}})
 		.then((user) => {
+			const imageName = user.avatar.split("/images/")[1];
 			// Verify the permissions
 			if(req.body.profileId != req.token ){
 			if(req.role  != 2) { return res.status(403).json({ message: "L'utilisateur n'as pas les droits requis." }) }};
@@ -137,9 +137,11 @@ exports.delete = (req, res, next) => {
 				.then((valid) => {
 					if(!valid) { return res.status(401).json({ error: "Mot de passe incorrect !" }) };
 					if(valid) {
-						User.destroy({ where: { id: req.body.profileId }})
-						.then(say => res.status(200).json({ message: "Utilisateur supprimé! "}))
-						.catch(err => res.status(400).json({ error: " Suppression échoué." }))
+						fs.unlink(`images/${imageName}`, () => {
+							User.destroy({ where: { id: req.body.profileId }})
+							.then(() => res.status(200).json({ message: "Utilisateur supprimé! "}))
+							.catch(err => res.status(400).json({ error: " Suppression échoué.", err }))
+						})
 					}
 				})
 		.catch(err => res.status(400).json({error: "Mot de passe incorrect" }, { err }));
