@@ -44,8 +44,8 @@
 
     <CommentBox v-if="showCommentBox" 
     :post_id= "post_id"
-    :visitor_id= "visitor_id"
-    :visitor_role= "visitor_role"
+    :visitor_id= "visitorId"
+    :visitor_role= "visitorRole"
     :post_comments= "post_comments"
     />
 

@@ -45,6 +45,7 @@ exports.updatePost = (req, res, next) => {
   Post.findAll({ where: { id: req.params.id } })
   .then((e) => {
     let foundPost = { ...e[0].dataValues };
+    console.log(`req.role is == ${req.role}`)
     if(req.token === foundPost.userId || req.role === 2 ){
         if(req.file){
           const newMedia = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;

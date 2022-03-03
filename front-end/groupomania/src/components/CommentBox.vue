@@ -50,7 +50,7 @@ export default {
       this.comments = [];
       axios.get("http://localhost:3000/forum/comment/" + this.post_id)
       .then((e) =>{
-        console.log(e);
+        if(e.data.length > 0) { this.noComment = false }
         for(let i = 0; i < e.data.length; i++){
           this.comments.push(e.data[i]);
         }

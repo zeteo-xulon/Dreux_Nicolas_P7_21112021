@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
+const db = require("../models");
+const User = db.user;
 
 module.exports = (req, res, next) => {
   try {
@@ -10,6 +12,14 @@ module.exports = (req, res, next) => {
     ________________________
       user ID = ${req.token}
       ______________________
+    `)
+    User.findOne({ where: { id: req.token }})
+    .then((user) => req.role = user.dataValues.role_id )
+    .catch(err => console.log(err))
+    console.log(`
+    ............................
+      user role = ${req.role}
+    ............................
     `)
     next();
   } 

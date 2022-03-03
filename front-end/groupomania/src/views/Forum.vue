@@ -58,7 +58,6 @@ export default {
     getPost(){
       axios.get("http://localhost:3000/forum")
       .then((res) => {
-        console.log(res);
         for(let i = 0; i < res.data.length; i++){
           this.posts.unshift(res.data[i]);
         }})
