@@ -10,6 +10,7 @@
     :creator_name="comment.user.firstname + ' ' + comment.user.lastname"
     :creator_avatar="comment.user.avatar"
     :comment_date="comment.updatedAt"
+    :comment_id="comment.id"
     :key="comment.id" />
     <font-awesome-icon v-if="!displayNewComment" @click.prevent="showNewComment" class="awesome__icon" icon="plus" />
 
@@ -46,8 +47,10 @@ export default {
     visitor_role: Number
   },
   methods: {
+    //====== READ ======
     getComments(){
       this.comments = [];
+      this.noComment = true;
       axios.get("http://localhost:3000/forum/comment/" + this.post_id)
       .then((e) =>{
         if(e.data.length > 0) { this.noComment = false }
@@ -68,7 +71,6 @@ export default {
   watch: {
     refreshComponent(newValue, oldValue){
       if(newValue > oldValue){
-        this.comments = [];
         return this.getComments()
       }
     }

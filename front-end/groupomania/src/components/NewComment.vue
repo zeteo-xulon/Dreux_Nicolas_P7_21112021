@@ -19,23 +19,20 @@ export default {
   props: { postId: Number },
   methods: {
     switchData(){ this.post_id = this.postId },
-
+    //====== CREATE ======
     postNewComment(){
-      const server = "http://localhost:3000";
       const user = JSON.parse(localStorage.getItem('user'));
       const config = { headers: { Authorization: user.token } };
-      const call = server + "/forum/comment/create/" + this.post_id;
       const comment = { text: document.getElementById('newCommentText').value };
-      if(!comment.text) { return alert("vous écrire quelque chose avant d'envoyer votre commentaire")}
-
-      axios.post(call, comment, config)
+      if( !comment.text ) { return alert("vous écrire quelque chose avant d'envoyer votre commentaire") }
+      axios.post("http://localhost:3000/forum/comment/create/" + this.post_id, comment, config)
       .then(() => {
         document.getElementById('newCommentText').value = "";
+        this.$parent.displayNewComment = false;
         this.$parent.refreshComponent++;
         })
       .catch(err => console.log(err))
     },
-
     closeNewComment(){ this.$parent.displayNewComment = false },
   },
   beforeMount(){ this.switchData() }

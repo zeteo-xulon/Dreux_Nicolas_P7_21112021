@@ -14,14 +14,16 @@ module.exports = (req, res, next) => {
       ______________________
     `)
     User.findOne({ where: { id: req.token }})
-    .then((user) => req.role = user.dataValues.role_id )
+    .then((user) => { 
+      req.role = user.dataValues.role_id
+      console.log(`
+      ............................
+        user role = ${req.role}
+      ............................
+      `)
+      next();
+    })
     .catch(err => console.log(err))
-    console.log(`
-    ............................
-      user role = ${req.role}
-    ............................
-    `)
-    next();
   } 
   catch (error) {
     res.status(401).json({ error: new Error('Unauthorized request!')});

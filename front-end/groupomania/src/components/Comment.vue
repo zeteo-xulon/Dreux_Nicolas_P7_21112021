@@ -7,17 +7,24 @@
       </aside>
       <p class="comment__date-created">{{ commentDate }}</p>
     </div>
+
     <p v-if="!updateText" class="comment__text">{{ text }}</p>
+
     <div v-if="updateText" class="comment__update">
-      <input  type="text" name="commentText" id="commentText">
-      <font-awesome-icon @click.prevent="updateComment" class="awesome__icon" icon="check" />
-      <font-awesome-icon @click.prevent="cancelUpdateComment" class="awesome__icon" icon="ban" />
+      <textarea name="commentText" id="commentText" :value="text" cols="30" rows="5"></textarea>
+      <aside class="comment__button-box">
+        <font-awesome-icon @click.prevent="updateComment" class="awesome__icon comment-scope" icon="check" />
+        <font-awesome-icon @click.prevent="cancelUpdateComment" class="awesome__icon comment-scope" icon="ban" />
+      </aside>
+      
     </div>
 
     <div v-if="deleteCommentQuestion" class="comment__update">
-       <p class="comment__text">Voulez vous vraiment supprimer ce commentaire ?</p>
-      <font-awesome-icon @click.prevent="deleteComment" class="awesome__icon" icon="check" />
-      <font-awesome-icon @click.prevent="cancelDeleteComment" class="awesome__icon" icon="ban" />
+      <p class="comment__text">Voulez vous vraiment supprimer ce commentaire ?</p>
+      <aside class="comment__button-box">
+        <font-awesome-icon @click.prevent="deleteComment" class="awesome__icon comment-scope" icon="check" />
+        <font-awesome-icon @click.prevent="cancelDeleteComment" class="awesome__icon comment-scope" icon="ban" />
+      </aside>
     </div>
 
     <div v-if="visitorCanUpdateOrDelete" class="comment__control">
@@ -36,6 +43,7 @@ export default {
   name: "Comment",
   props: {
     post_id: Number,
+    comment_id: Number,
     visitor_id: Number,
     visitor_role: Number,
     text: String,
@@ -73,20 +81,46 @@ export default {
     verifyUser(){
       if( this.visitorId == this.post_id || this.visitorRole === 2 ) { return this.visitorCanUpdateOrDelete = true }
     },
-    displayUpdateComment(){},
-    updateComment(){
-    let user = JSON.parse(localStorage.getItem('user'));
-    let config = { headers: { 'Authorization' : user.token } };
-    let text = document.getElementById('commentTextUpdate');
-
-    axios.put("http://localhost:3000/forum/comment",text, config)
-    .then()
-    .catch(err => console.log(err))
+    //====== UPDATE ======
+    displayUpdateComment(){
+      this.updateText = true;
+      this.updateButton = false;
+      this.deleteButton = false;
     },
-    cancelUpdatecomment(){},
-    displayDeleteComment(){},
-    deleteComment(){},
-    cancelDeleteComment(){}
+    updateComment(){
+      const user = JSON.parse(localStorage.getItem('user'));
+      const config = { headers: { 'Authorization' : user.token } };
+      const text = document.getElementById('commentText').value;
+      if(text.length == 0) { return alert('Vous devez entrer du text pour modifier le texte précédent.')}
+      const updatedText = { text: text };
+
+      axios.put( "http://localhost:3000/forum/comment/update/" + this.comment_id, updatedText, config )
+      .then(() => { this.$parent.refreshComponent++ })
+      .catch(err => console.log(err))
+    },
+    cancelUpdateComment(){
+      this.updateText = false;
+      this.updateButton = true;
+      this.deleteButton = true;
+    },
+    //====== DELETE ======
+    displayDeleteComment(){
+      this.deleteCommentQuestion = true;
+      this.updateButton = false;
+      this.deleteButton = false;
+    },
+    deleteComment(){
+      const user = JSON.parse(localStorage.getItem('user'));
+      const config = { headers: { 'Authorization' : user.token } };
+      axios.delete("http://localhost:3000/forum/comment/delete/" + this.comment_id, config)
+      .then(() => { this.$parent.refreshComponent++ })
+      .catch(err => console.log(err))
+    },
+    cancelDeleteComment(){
+      this.deleteCommentQuestion = false;
+      this.updateButton = true;
+      this.deleteButton = true;
+    }
   },
   beforeMount() {
     this.switchData()
@@ -135,6 +169,15 @@ export default {
     font-size: 1rem;
   }
 }
+
+.comment__update{
+  display: flex;
+  & comment__button-box{
+    display: flex;
+    flex-flow: column nowrap;
+  }
+}
+
 .comment-scope{
   color: $complementary-primary-color;
   border: 2px solid $complementary-primary-color;
