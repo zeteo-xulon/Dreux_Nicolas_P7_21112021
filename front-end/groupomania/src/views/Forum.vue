@@ -42,6 +42,13 @@ export default {
   },
   components: { Header, NewPost, Post, Foot },
   methods: {
+    loadPage(){
+      if(!localStorage.getItem('user')){
+        return this.$router.push('../views/')
+      } else {
+        this.verifyUser()
+      }
+    },
     verifyUser(){
       let user = JSON.parse(localStorage.getItem('user'));
       let config = {  headers: {"Authorization": user.token} }
@@ -74,7 +81,7 @@ export default {
     }
   },
   beforeMount(){
-    this.verifyUser();
+    this.loadPage();
     this.getPost();
   },
 }

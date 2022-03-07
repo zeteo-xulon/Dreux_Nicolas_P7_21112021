@@ -152,6 +152,15 @@ export default {
       })
       .catch(err => console.log(err))
     },
+    toLocalDate(){
+      let date = new Date(this.creationDate)
+      this.postCreated = date.toLocaleString('fr-FR', {
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+      })
+    },
     switchToData(){
       this.post_id = this.postId;
       this.post_title = this.postTitle;
@@ -161,7 +170,7 @@ export default {
       this.post_comments = this.comments;
       this.postCreator = this.creator.firstname + " " + this.creator.lastname;
       this.postCreatorAvatar = this.creator.avatar;
-      this.postCreated = this.creationDate;
+      this.toLocalDate();
       this.postCreatorId =this.creator.id;
       this.visitor_id = this.visitorId;
       this.visitor_role = this.visitorRole;

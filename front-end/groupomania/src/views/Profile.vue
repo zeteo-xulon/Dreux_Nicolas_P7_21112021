@@ -2,7 +2,8 @@
   <section class="container">
     <Header />
     <div class="profile">
-        <h1>Informations</h1>
+        <h1 v-if="!noUser">Informations</h1>
+        <h1 v-if="noUser">Cette utilisateur(rice) n'existe pas.</h1>
 
         <div v-if="displayProfile" class="profile__display">
           <img :src="profile.avatar" alt="avatar picture" class="profile__avatar" id="profileAvatar"/>
@@ -79,7 +80,7 @@
       </aside>
       <aside v-if="displayDelete" >
         <form class="delete__container">
-        <p>Veuillez entrer le mot de passe pour supprimer le compte.</p>
+        <p>Veuillez entrer votre mot de passe pour supprimer le compte.</p>
         <label for="password">Mot de passe :</label>
         <input id="deletePassword" type="password" minlength="8" autocomplete="off">
         <div class="delete__btn-container">
@@ -103,16 +104,14 @@
   import Foot from '@/components/Foot.vue';
   export default {
     name: 'Profile',
-    components: {
-      Header,
-      Foot
-    },
+    components: { Header, Foot },
     data(){
       return {
         displayProfile: true,
         showPasswordUpdateContainer: false,
         showUpdateProfile: false,
         displayDelete: false,
+        noUser: false,
         profile: {
           id: parseInt(this.$route.params.id),
           email: "",
@@ -127,27 +126,12 @@
       }
     },
     methods: {
-        loadPage(){
-          if(!localStorage.getItem('user')){
-            return this.$router.push('../views/')
-          } else {
-            this.getInfo()
-          }
-        },
+        loadPage(){ !localStorage.getItem('user') ? this.$router.push('../views/') : this.getInfo() },
         getInfo(){
-          axios.get(server + '/' + this.profile.id)
-          .then((res) => {
-            let profileUser = res.data.dataValues;
-            this.profile.firstname = profileUser.firstname;
-            this.profile.lastname = profileUser.lastname;
-            this.profile.email = profileUser.email;
-            this.profile.job = profileUser.job;
-            this.profile.bio = profileUser.bio;
-            this.profile.password = profileUser.password;
-            this.profile.avatar = profileUser.avatar;
-
-            this.verifyUser();
-          })
+          let user = JSON.parse(localStorage.getItem('user'));
+          let config = { headers: {'Authorization': user.token } }
+          axios.get(server + '/' + this.profile.id, config)
+          .then((res) => { res.data.dataValues ? (this.switchData(res), this.verifyUser()) : this.displayNoUser() })
           .catch(err => console.log(err))
         },
         verifyUser(){
@@ -163,6 +147,10 @@
           console.log(err);
           })
         },
+        displayNoUser(){
+          this.noUser = true;
+          this.displayProfile = false;
+        },
         showPasswordContainer(){
           if(!this.showPasswordUpdateContainer){
             this.showPasswordUpdateContainer = true;
@@ -172,6 +160,16 @@
             this.showUpdateProfile = false;
             this.displayProfile = true;
           }
+        },
+        switchData(res){
+          let profileUser = res.data.dataValues;
+              this.profile.firstname = profileUser.firstname;
+              this.profile.lastname = profileUser.lastname;
+              this.profile.email = profileUser.email;
+              this.profile.job = profileUser.job;
+              this.profile.bio = profileUser.bio;
+              this.profile.password = profileUser.password;
+              this.profile.avatar = profileUser.avatar;
         },
         displayUpdateContainer(){
           if(!this.showUpdateProfile){
@@ -204,7 +202,6 @@
 
           if(firstname == ""){ return alert("Veuillez remplir la case du prénom.")}
           if(lastname == ""){ return alert("Veuillez remplir la case du nom.")}
-
           let dataToUpdate = { email: email, firstname: firstname, lastname: lastname, job: job, bio: bio };
 
           axios.put(server + '/' + this.profile.id, dataToUpdate, config)
@@ -217,7 +214,7 @@
         },
         updateAvatar(event){
           let user = JSON.parse(localStorage.getItem('user'));
-          let urlImage = server + "/images/" + user.id;
+          let urlImage = server + "/images/" + this.profile.id;
           let picture = event.target.files[0];
           let formData = new FormData();
           formData.append('image', picture);
@@ -270,18 +267,15 @@
         deleteUser(){
           const visitor = JSON.parse(localStorage.getItem('user'));
           const password = document.getElementById('deletePassword').value;
-          const config = { 
-            headers: { "Authorization": visitor.token }, 
-            data: {
-              "profileId": this.profile.id,
-              "password": password 
-              }};
-          const adress = server + "/" + this.profile.id;
-          
+          const config = { headers: { "Authorization": visitor.token }, data: { "profileId": this.profile.id, "password": password }};
+          const adress = server + "/" + this.profile.id;    
           axios.delete(adress, config)
           .then(() => {
-            localStorage.removeItem('user')
-             return this.$router.push({ path: '../views/'})
+            if(this.visitor.role === 1) {
+              localStorage.removeItem('user')
+              return this.$router.push({ path: '../views/'})
+            }
+            if(this.visitor.role === 2) { return this.$router.push({ path: '../views/forum'}) }
           })
           .catch((err) => console.log(err));
         }

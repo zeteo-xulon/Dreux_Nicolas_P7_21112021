@@ -49,7 +49,7 @@ exports.login = (req, res, next) => {
 };
 
 exports.read = (req, res, next) => {
-	User.findOne({ where: { id: req.params.id}})
+	User.findOne({ where: { id: req.params.id }})
 	.then((user) => {
 		res.status(200).json({...user});
 	})
@@ -101,51 +101,79 @@ exports.updatePassword = (req, res, next) => {
 };
 
 exports.updateProfileImage = (req, res, next) => {
-	console.log(req.file);
-	User.findOne({ where: { id: req.token }})
+	let profile = req.params.id;
+	User.findOne({ where: { id: req.params.id }})
 	.then((e) => {
+		let user = e.dataValues;
+		console.log(user);
+		if(req.token !== user.id || req.role !== 2 ){ return res.status(401).json({ message: "Vous n'avez pas les droits requis pour modifier l'avatar de cet utilisateur(rice)." }) }
 		const avatar = `${req.protocol}://${req.get("host")}/images/${ req.file.filename }`;
 		if(e.avatar !== "http://localhost:3000/images/default-avatar.jpg"){
 			const imageName = e.avatar.split("/images/")[1];
 			fs.unlink(`images/${imageName}`, () =>{
-				User.update({ avatar: avatar }, { where: { id: req.token }})
-				.then(() => res.status(201).json({ message: "Avatar modifié." }))
-				.catch((err) => res.status(400).json({ err, message: "L'Avatar n'as pas pu êter modifié." }))	
+				updateUser(req, res, profile, avatar)
 			})
-		} else {
-			User.update({ avatar: avatar }, { where: { id: req.token }})
-			.then(() => res.status(201).json({ message: "Avatar modifié." }))
-			.catch((err) => res.status(400).json({ err, message: "L'Avatar n'as pas pu être modifié." }))	
-		}
+		} else { updateUser(req, res, profile, avatar) }
 	})
 	.catch(err => res.status(401).json({ err }));
-	
 };
 
 
 // DELETE user
 exports.delete = (req, res, next) => {
-	User.findOne({ where: { id: req.body.profileId}})
+	let profile = req.body.profileId;
+	User.findOne({ where: { id: profile}})
 		.then((user) => {
 			const imageName = user.avatar.split("/images/")[1];
 			// Verify the permissions
-			if(req.body.profileId != req.token ){
-			if(req.role  != 2) { return res.status(403).json({ message: "L'utilisateur n'as pas les droits requis." }) }};
-			let foundUser = { ...user };
-			let foundUserPassword = foundUser.dataValues.password;
-				bcrypt.compare(req.body.password, foundUserPassword)
+			if(profile != req.token ){
+				if(req.role  !== 2) { return res.status(403).json({ message: "L'utilisateur n'as pas les droits requis." }) }
+				// For the moderator, We verify the moderator's password, not the user one (obviously)
+				return User.findOne({ where: { id: req.token } })
+					.then((e) => {
+						let moderator = e.dataValues;
+						bcrypt.compare(req.body.password, moderator.password)
+						.then((valid) => {
+							if(!valid) { return res.status(401).json({ error: "Mot de passe incorrect !" }) };
+							if(valid) {
+								// Verify the image before delete the profile
+								if( user.avatar !== "http://localhost:3000/images/default-avatar.jpg" ) {
+									fs.unlink(`images/${imageName}`, () => {
+										deleteUser(req, res, profile)
+									})
+								} else {
+									deleteUser(req, res, profile)
+								}						
+				}})})
+			};
+			// For current User of the profile
+			let foundUser = user.dataValues ;
+				bcrypt.compare(req.body.password, foundUser.password)
 				.then((valid) => {
 					if(!valid) { return res.status(401).json({ error: "Mot de passe incorrect !" }) };
 					if(valid) {
-						fs.unlink(`images/${imageName}`, () => {
-							User.destroy({ where: { id: req.body.profileId }})
-							.then(() => res.status(200).json({ message: "Utilisateur supprimé! "}))
-							.catch(err => res.status(400).json({ error: " Suppression échoué.", err }))
-						})
-					}
-				})
+						// Verify the image before delete the profile
+						if( user.avatar !== "http://localhost:3000/images/default-avatar.jpg" ) {
+							fs.unlink(`images/${imageName}`, () => {
+								deleteUser(req, res, profile)
+							})
+						} else {
+							deleteUser(req, res, profile)
+						}	
+				}})
 		.catch(err => res.status(400).json({error: "Mot de passe incorrect" }, { err }));
 		})
 	.catch(err => res.status(400).json({ error: "Utilisateur non trouvé." }))
 };
+
+function deleteUser(req, res, id){
+	User.destroy({ where: { id: id }})
+		.then(() => res.status(200).json({ message: "Utilisateur supprimé! "}))
+		.catch(err => res.status(400).json({ error: " Suppression échoué.", err }))
+}
+function updateUser(req, res, id, avatar) {
+	User.update({ avatar: avatar }, { where: { id: id }})
+	.then(() => res.status(201).json({ message: "Avatar modifié." }))
+	.catch((err) => res.status(400).json({ err, message: "L'Avatar n'as pas pu être modifié." }))	
+}
 

@@ -78,9 +78,7 @@ export default {
         minute: 'numeric'
       })
     },
-    verifyUser(){
-      if( this.visitorId == this.post_id || this.visitorRole === 2 ) { return this.visitorCanUpdateOrDelete = true }
-    },
+    verifyUser(){ if( this.visitorId == this.creator_id || this.visitorRole === 2 ) { return this.visitorCanUpdateOrDelete = true }},
     //====== UPDATE ======
     displayUpdateComment(){
       this.updateText = true;
