@@ -106,7 +106,7 @@ exports.updateProfileImage = (req, res, next) => {
 	.then((e) => {
 		let user = e.dataValues;
 		console.log(user);
-		if(req.token !== user.id || req.role !== 2 ){ return res.status(401).json({ message: "Vous n'avez pas les droits requis pour modifier l'avatar de cet utilisateur(rice)." }) }
+		if(req.token !== user.id && req.role !== 2 ){ return res.status(401).json({ message: "Vous n'avez pas les droits requis pour modifier l'avatar de cet utilisateur(rice)." }) }
 		const avatar = `${req.protocol}://${req.get("host")}/images/${ req.file.filename }`;
 		if(e.avatar !== "http://localhost:3000/images/default-avatar.jpg"){
 			const imageName = e.avatar.split("/images/")[1];
@@ -150,7 +150,7 @@ exports.delete = (req, res, next) => {
 			let foundUser = user.dataValues ;
 				bcrypt.compare(req.body.password, foundUser.password)
 				.then((valid) => {
-					if(!valid) { return res.status(401).json({ error: "Mot de passe incorrect !" }) };
+					if(!valid) { console.log('here it is'); return res.status(401).json({ message: "Mot de passe incorrect !" }) };
 					if(valid) {
 						// Verify the image before delete the profile
 						if( user.avatar !== "http://localhost:3000/images/default-avatar.jpg" ) {

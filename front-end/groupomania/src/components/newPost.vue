@@ -35,8 +35,9 @@ export default {
       const imageAlt = document.getElementById('mediaDescription').value;
       let formData = new FormData();
       if(image){
-       formData.append('image', image);
-       if(imageAlt){ formData.append('media_description', imageAlt) }
+        if( image.size > 2100000 ) { return alert("La taille maximale de l'image ne doit pas dépasser les 2 Mo.") }
+        formData.append('image', image);
+        if(imageAlt){ formData.append('media_description', imageAlt) }
       }
       formData.append('title', this.postTitle);
       formData.append('text', this.postText);

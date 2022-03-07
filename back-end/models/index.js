@@ -62,31 +62,4 @@ db.post.belongsTo(db.user);
 db.comment.belongsTo(db.post, { onDelete: "CASCADE" });
 db.comment.belongsTo(db.user);
 
-
-//====================================
-// SAVE PLACE
-/*
-
-onDelete: "CASCADE"
-
-*/
-
-
-// //user
-// db.user.hasMany(db.post, {foreignKey: "post_creator_id", onDelete: "CASCADE"})
-// db.user.hasMany(db.comment, {foreignKey: "comment_creator_id", onDelete: "CASCADE"})
-
-// //role
-// db.user.hasOne(db.role);
-// db.role.belongsTo(db.user, { foreignKey: "role_id", onDelete:"NO ACTION", setDefault: 1 });
-
-// //post
-// db.post.hasMany(db.comment, { foreignKey: "post_id", onDelete: "CASCADE" });
-// db.post.belongsTo(db.user, { foreignKey: "post_creator_id" });
-
-// //comment
-// db.comments.belongsTo(db.post, { foreignKey: "post_id" });
-// db.comments.belongsTo(db.user, { foreignKey: "comment_creator_id" });
-
-// , { through: 'db.post' }
 module.exports = db;

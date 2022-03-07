@@ -227,7 +227,7 @@
             return this.showUpdateProfile = false;
           })
           .catch((err) => {
-            console(err);
+            console.log(err);
             alert('Le fichier doit être une image de moins de 2 Mo.');
             })
         },
@@ -277,7 +277,7 @@
             }
             if(this.visitor.role === 2) { return this.$router.push({ path: '../views/forum'}) }
           })
-          .catch((err) => console.log(err));
+          .catch((err) => { alert("Mot de passe incorrect"); console.log(err) });
         }
     },
     beforeMount(){

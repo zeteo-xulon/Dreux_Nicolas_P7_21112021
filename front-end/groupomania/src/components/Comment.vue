@@ -2,7 +2,7 @@
   <article class="comment">
     <div class="comment__info">
       <aside class="separation">
-        <img class="comment__info__user-avatar" :src="creator_avatar" alt="Avatar de l'utilisateur" />
+        <img @click.prevent="goToProfile" class="comment__info__user-avatar" :src="creator_avatar" alt="Avatar de l'utilisateur" />
         <p class="comment__creator">{{ creator_name }}</p>
       </aside>
       <p class="comment__date-created">{{ commentDate }}</p>
@@ -78,6 +78,7 @@ export default {
         minute: 'numeric'
       })
     },
+    goToProfile(){ return this.$router.push({ path: '/profile/' + this.creator_id}) },
     verifyUser(){ if( this.visitorId == this.creator_id || this.visitorRole === 2 ) { return this.visitorCanUpdateOrDelete = true }},
     //====== UPDATE ======
     displayUpdateComment(){
@@ -153,6 +154,7 @@ export default {
       border: 2px solid $complementary-primary-color;
       border-radius: 50%;
       margin-right: 10px;
+      cursor: pointer;
     }
   }
   &__creator{

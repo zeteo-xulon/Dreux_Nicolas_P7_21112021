@@ -3,6 +3,7 @@
 ----------------------------------------------------------------*/
 const express = require('express');
 const app = express();
+const helmet = require('helmet')
 const dotenv = require('dotenv').config();
 const db = require("./models");
 const User = db.user;
@@ -11,11 +12,12 @@ const path = require('path');
 const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
 const commentRoutes = require('./routes/comment');
+const ratelimit = require('express-rate-limit')
 
 /*----------------------------------------------------------------
 													USE
 ----------------------------------------------------------------*/
-app.use(express.json());
+
 
 // CORS
 app.use((req, res, next) => {
@@ -25,8 +27,16 @@ app.use((req, res, next) => {
 	next();
 });
 
+// Limit the number of request to 150 request each minute
+const limiter = ratelimit({ windowMs: 1 * 60 * 1000, max: 150 })
 
 
+/*----------------------------------------------------------------
+													APP
+----------------------------------------------------------------*/
+app.use(express.json());
+app.use(helmet());
+app.use(limiter);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('', userRoutes);
 app.use('', postRoutes);

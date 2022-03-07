@@ -4,7 +4,7 @@
     <div v-if="!displayPostUpdateContainer" class="post__info__container">
       <div class="post__info">
         <aside class="separation">
-          <img class="post__info__user-avatar" :src="postCreatorAvatar" alt="Avatar de l'utilisateur" />
+          <img @click.prevent="goToProfile" class="post__info__user-avatar" :src="postCreatorAvatar" alt="Avatar de l'utilisateur" />
           <p class="post__creator">{{ postCreator }}</p>
         </aside>
         <p class="post__date-created">{{ postCreated }}</p>
@@ -36,10 +36,18 @@
       </form>
     </section>
 
+     <div v-if="displayDeletePostQuestion" class="post__delete">
+      <p class="post__text">Voulez vous vraiment supprimer ce post ?</p>
+      <aside class="post__button-box">
+        <font-awesome-icon @click.prevent="deletePost" class="awesome__icon" icon="check" />
+        <font-awesome-icon @click.prevent="cancelDeletePost" class="awesome__icon" icon="ban" />
+      </aside>
+    </div>
+    
     <div class="post__btn-container">
       <font-awesome-icon v-show="!displayPostUpdateContainer" @click="displayComments" class="awesome__icon" id="postCommentBtn" icon="comment-dots" />
       <font-awesome-icon v-if="visitorCanUpdateOrDelete" v-show="!displayPostUpdateContainer" @click.prevent="displayPostUpdate" class="awesome__icon" id="postUpdateBtn" icon="edit" />
-      <font-awesome-icon v-if="visitorCanUpdateOrDelete" v-show="!displayPostUpdateContainer" @click.prevent="postDelete" class="awesome__icon" id="postDeleteBtn" icon="trash" />
+      <font-awesome-icon v-if="visitorCanUpdateOrDelete" v-show="!displayPostUpdateContainer" @click.prevent="displayDeleteContainer" class="awesome__icon" id="postDeleteBtn" icon="trash" />
     </div>
 
     <CommentBox v-if="showCommentBox" 
@@ -75,6 +83,7 @@ export default {
       visitor_role: "",
       visitorCanUpdateOrDelete: false,
       displayPostUpdateContainer: false,
+      displayDeletePostQuestion: false,
       asBeenDeleted: false,
       showCommentBox: false
     }
@@ -93,17 +102,16 @@ export default {
   },
   methods: {
     checkUserHabilities(){
-      if(this.visitorId === this.postCreatorId || this.visitorRole === 2){
-          this.visitorCanUpdateOrDelete = true;
-      }
+      if(this.visitorId === this.postCreatorId || this.visitorRole === 2){ this.visitorCanUpdateOrDelete = true  }
     },
-    displayPostUpdate(){
-      !this.displayPostUpdateContainer ? this.displayPostUpdateContainer = true : this.displayPostUpdateContainer = false;
+    displayPostUpdate(){ !this.displayPostUpdateContainer ? this.displayPostUpdateContainer = true : this.displayPostUpdateContainer = false },
+    displayComments(){ !this.showCommentBox ? this.showCommentBox = true : this.showCommentBox = false },
+    goToProfile(){ return this.$router.push({ path: '/profile/' + this.creator.id}) },
+    displayDeleteContainer(){
+      this.displayDeletePostQuestion = true;
+      this.displayPostUpdateContainer = false;
     },
-    displayComments(){
-      !this.showCommentBox ? this.showCommentBox = true : this.showCommentBox = false;
-    },
-    postDelete(){
+    deletePost(){
       let user = JSON.parse(localStorage.getItem('user'));
       let config = { headers: { 'Authorization' : user.token } };
       let route = `http://localhost:3000/forum/delete/${this.post_id}`;
@@ -113,6 +121,10 @@ export default {
         alert('Post supprimé avec succès');
         })
       .catch(err => console.log(err))
+    },
+    cancelDeletePost(){
+      this.displayDeletePostQuestion = false;
+      this.displayPostUpdateContainer = false;
     },
     submitUpdatedPost(){
       let user = JSON.parse(localStorage.getItem('user'));
@@ -127,6 +139,7 @@ export default {
       if(this.postTitle != title){ formData.append('title', title) }
       if(this.postText != text){ formData.append('text', text) }
       if(image){
+        if( image.size > 2100000 ) { return alert("La taille maximale de l'image ne doit pas dépasser les 2 Mo.") }
         formData.append('image', image);
         if(imageAlt){ formData.append('media_description', imageAlt) }
       }
@@ -210,6 +223,7 @@ export default {
       border: 1px solid $primary-color;
       border-radius: 50%;
       margin-left: 10px;
+      cursor: pointer;
     }
   & .post__creator {
     font-weight: bold;
