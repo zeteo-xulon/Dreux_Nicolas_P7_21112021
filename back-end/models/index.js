@@ -55,7 +55,7 @@ db.user.hasOne(db.role);
 db.role.belongsTo(db.user);
 
 //post
-db.post.hasMany(db.comment);
+db.post.hasMany(db.comment, { onDelete: "CASCADE" });
 db.post.belongsTo(db.user);
 
 //comment

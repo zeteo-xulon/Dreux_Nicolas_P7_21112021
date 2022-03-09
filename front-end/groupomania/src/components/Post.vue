@@ -323,4 +323,13 @@ input[type="file"] {
     border: 2px solid black;
   }
 }
+.post__delete{
+  margin: 5px;
+  padding: 5px;
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: $primary-color;
+  border: 5px double $primary-color;
+  border-radius: 10px;
+}
 </style>

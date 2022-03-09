@@ -11,7 +11,7 @@
         <textarea class="form__text" rows="5" cols="20" v-model="postText">
         </textarea>
       </div>
-      <input type="file">
+      <input id="newFile" type="file">
       <input type="text" id="mediaDescription" placeholder="Décrivez l'image en quelques mots."/>
       <button @click.prevent="submitPost">Créer un nouveau post</button>
     </form>
@@ -22,16 +22,18 @@
 const axios = require('axios');
 export default {
   name: 'NewPost',
-  data(){
-    return {
-      postTitle: "",
-      postText: ""
-    }
-  },
+  data(){ return { postTitle: "", postText: "" } },
   methods: {
-    submitPost(event){
+    /** 
+     * Send a request to the server to create a new post
+     * Get the values of user from the localStorage, the media from the file input
+     * The user can provide a description of the media in the text input under file input
+     * Everything will be added inside the formData and send to the server.
+     * After the response of the server, if clear, the forum view will refresh.
+     */
+    submitPost(){
       let user = JSON.parse(localStorage.getItem('user'));
-      const image = event.target.form[2].files[0];
+      const image = document.getElementById('newFile').files[0];
       const imageAlt = document.getElementById('mediaDescription').value;
       let formData = new FormData();
       if(image){
@@ -41,14 +43,9 @@ export default {
       }
       formData.append('title', this.postTitle);
       formData.append('text', this.postText);
-      let config = {
-        headers: { 'Authorization': user.token },
-      }
+      let config = { headers: { 'Authorization': user.token } };    
       axios.post("http://localhost:3000/forum/create/", formData, config)
-        .then(() => {
-          console.log('its done');
-          this.$parent.refreshView++
-          })
+        .then(() => { this.$parent.refreshView++  })
         .catch(err => console.log(err))
     }
   }
@@ -77,25 +74,17 @@ export default {
     align-items: flex-start;
     flex-flow: column nowrap;
     width: 100%;
-    & #formTitle{
-      width: 100%;
-    }
+    & #formTitle{ width: 100%; }
   }
   & .form__input__container{
     width: 100%;
-    & .form__text{
-     width: 100%;
-    }
+    & .form__text{ width: 100%; }
   }
 }
 .form__title{
       font-weight: bold;
       font-size: 1.2rem;
 }
-input[type="file"] {
-  width: 100%;
-}
-#mediaDescription {
-    width: 100%;
-}
+input[type="file"] { width: 100%; }
+#mediaDescription { width: 100%; }
 </style>
