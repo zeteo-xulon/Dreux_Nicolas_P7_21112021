@@ -63,3 +63,18 @@ and write :
 When all the dependencies are intalled, you can run the front by typing :
 `npm run serve`
 
+For the build version, please tip : 
+`npm run build`
+
+##### Previewing Locally
+The ``dist`` directory is meant to be served by an HTTP server (unless you've configured ``publicPath`` to be a relative value), so it will not work if you open ``dist/index.html`` directly over ``file://`` protocol. The easiest way to preview your production build locally is using a Node.js static file server, for example serve:
+```sh
+npm install -g serve
+# -s flag means serve it in Single-Page Application mode
+# which deals with the routing problem below
+serve -s dist
+```
+And it will need a publicPath to be fullfill with your own relative path.
+
+You can find more information here :
+[link here](https://cli.vuejs.org/guide/deployment.html#general-guidelines)
