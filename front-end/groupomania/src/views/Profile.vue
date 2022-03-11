@@ -243,7 +243,6 @@
             return alert('Les mots de passe ne correspondent pas.')
           }
           let passwordChangeForm = {
-            profileId: this.profile.id,
             originalPassword: this.profile.password,
             originalPasswordRetype: password,
             newPasswordFirstValue: newPassword1,
@@ -267,7 +266,7 @@
         deleteUser(){
           const visitor = JSON.parse(localStorage.getItem('user'));
           const password = document.getElementById('deletePassword').value;
-          const config = { headers: { "Authorization": visitor.token }, data: { "profileId": this.profile.id, "password": password }};
+          const config = { headers: { "Authorization": visitor.token }, data: { "password": password }};
           const adress = server + "/" + this.profile.id;    
           axios.delete(adress, config)
           .then(() => {

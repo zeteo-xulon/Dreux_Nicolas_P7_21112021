@@ -1,8 +1,9 @@
 const passwordValidator = require('password-validator');
 
+/* Verify a password using the specification passed in the passwordSchema constructor
+ * @constructor 
+*/
 const passwordSchema = new passwordValidator();
-
-// Schema for password validation
 passwordSchema
 .is().min(8)                                    // Minimum length 8
 .is().max(100)                                  // Maximum length 100

@@ -2,6 +2,9 @@ const http = require('http');
 const app = require('./app');
 const fs = require('fs');
 
+/*==========================================
+ *          SERVER CONFIGURATION
+ ==========================================*/
 const normalizePort = val => {
   const port = parseInt(val, 10);
 

@@ -1,10 +1,19 @@
+/** fs = FileSystem, already inside Express to manipulate the file object */
 const fs = require('fs');
+/** The models used in the query with the DataBase */
 const db = require("../models");
 const Post = db.post;
 const Comment = db.comment;
 const User = db.user;
 
-// Create new post
+/** 
+ * CREATE A NEW POST
+ * Create a new post using the text from the body, the user id from the token, The file if there is one, and throught Sequelize, it will write it on the Database
+ * A Post model require a Title, a Text, and optionnally a file with the description.
+ * @param {Object} req - The request contain the data coming from the request
+ * @param {Object} res - The response from the server
+ * @param {Function} next - The next function is used to continue unto the next step of the code
+ */
 exports.createPost = (req, res, next) => {
   let media = "";
   let alt = "L'utilisateur n'a pas fourni de description à cette image."
@@ -27,20 +36,47 @@ exports.createPost = (req, res, next) => {
   .catch((error) => res.status(400).json({ error }));
 };
 
-// will send all the existing post
+/** 
+ * READ POSTS
+ * Return all the posts in the response including :
+ *  -the user for each post
+ *  -the comment of each post
+ *  -and the user for each comment
+ * @param {Object} req - The request contain the data coming from the request
+ * @param {Object} res - The response from the server
+ * @param {Function} next - The next function is used to continue unto the next step of the code
+ */
 exports.readAllPost = (req, res, next) => {
   Post.findAll({ include: [{ model: User }, { model: Comment, include: { model: User } }]})
   .then((e) => { res.status(200).json(e) })
   .catch((error) => res.status(400).json({ error }));
 }
-// Reload an existing post after an Update
+ 
+/** 
+ * READ ONE POST
+ * Return one post in the response, used to reload an existing post after an UPDATE
+ * @param {Object} req - The request contain the data coming from the request
+ * @param {Object} res - The response from the server
+ * @param {Function} next - The next function is used to continue unto the next step of the code
+ */
 exports.readOnePost = (req, res, next) => {
   Post.findAll({ where: { id: req.params.id}})
   .then((e) => { res.status(200).json(e) })
   .catch((error) => res.status(400).json({ error }));
 }
 
-// Update existing post
+/** 
+ * UPDATE POST
+ * First the server find the post with the id passed in the parameter
+ * Then it verify if the user have the privilege to update it throught the id or the role returned by auth middleware.
+ * Verify if there is a file
+ * if there is one, fs - FileSystem unlink / delete the previous media file
+ * And then update the post with the data received from the front
+ * When the response have a status 200 the front should auto reload
+ * @param {Object} req - The request contain the data coming from the request
+ * @param {Object} res - The response from the server
+ * @param {Function} next - The next function is used to continue unto the next step of the code
+ */
 exports.updatePost = (req, res, next) => {
   Post.findAll({ where: { id: req.params.id } })
   .then((e) => {
@@ -75,6 +111,17 @@ exports.updatePost = (req, res, next) => {
   .catch(err => res.status(400).json(err)) 
 };
 
+/**
+ * DELETE POST
+ * First the server find the post with the id passed in the parameter
+ * Then it verify if the user have the privilege to delete it throught the id or the role returned by auth middleware.
+ * Verify if there is a file in the post found
+ * If there is one, fs - FileSystem unlink / delete the file
+ * Finally it delete the post
+ * @param {Object} req - The request contain the data coming from the request
+ * @param {Object} res - The response from the server
+ * @param {Function} next - The next function is used to continue unto the next step of the code
+ */
 exports.deletePost = (req, res, next) => {
   Post.findAll({ where: { id: req.params.id } })
   .then((event) => {

@@ -8,6 +8,13 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
+/* ==========================================
+ *
+ * This file is configured throught the default Sequelize (version 6) CLI.
+ * All the documentation can be found at :
+ * https://sequelize.org/v6/manual/migrations.html
+ * 
+ ========================================== */
 let sequelize;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
@@ -35,23 +42,29 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 
-/*==========================================
-*             TABLES MODELES
-==========================================*/
+/* ==========================================
+ *             TABLES MODELS
+ *
+ * Documentation: https://sequelize.org/v6/manual/model-instances.html
+ ========================================== */
 db.user = require("./User")(sequelize, Sequelize);
 db.post = require("./Post")(sequelize, Sequelize);
 db.comment = require("./Comment")(sequelize, Sequelize);
 db.role = require("./Role")(sequelize, Sequelize);
 
-/*==========================================
-*             TABLES JOIN
-==========================================*/
+/** ==========================================
+ *             TABLES ASSOCIATIONS
+ *
+ * Documentation: https://sequelize.org/v6/manual/assocs.html
+ * @params {instance} db. - The db. contain an instance of Sequelize and of each models.
+ * @params {options} option - The option possible to specify the customization of the association.
+ ========================================== */
 //user
 db.user.hasMany(db.post);
 db.user.hasMany(db.comment);
+db.user.hasOne(db.role);
 
 //role
-db.user.hasOne(db.role);
 db.role.belongsTo(db.user);
 
 //post

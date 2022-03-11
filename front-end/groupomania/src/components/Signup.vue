@@ -55,7 +55,7 @@ export default {
       if(firstname.length > 50 ){ return alert('Le prénom ne doit pas dépasser les 50 caractères.')}
       if(lastname.length > 50 ){ return alert('Le nom de famille ne doit pas dépasser les 50 caractères.')}
       if(email.length > 100 ){ return alert("L'adresse email ne doit pas dépasser les 100 caractères.")}
-      if(password.length > 100 ){ return alert('Le mot de passe ne doit pas dépasser les 100 caractères.')}
+      if( password.length < 8 || password.length > 100 ){ return alert( 'Le mot de passe ne doit pas dépasser les 100 caractères, et avoir au minimum 8 caractère, 1 majuscule, 1 minuscule, et 2 chiffres.' )}
       this.formIsClear = true ;
     }
   }
