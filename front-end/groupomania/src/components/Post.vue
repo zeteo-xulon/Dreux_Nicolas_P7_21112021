@@ -148,7 +148,6 @@ export default {
       axios.put("http://localhost:3000/forum/update/" + this.postId, formData, config)
         .then(() => {
           let buttonText = document.getElementById('postUpdateBtn');
-          console.log('its done');
           buttonText.innerText = "Modifier";
           this.displayPostUpdateContainer = false;
           })

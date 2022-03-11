@@ -151,6 +151,7 @@ export default {
     &__user-avatar{
       height: 50px;
       width: 50px;
+      object-fit: cover;
       border: 2px solid $complementary-primary-color;
       border-radius: 50%;
       margin-right: 10px;

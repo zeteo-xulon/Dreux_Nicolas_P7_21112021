@@ -51,11 +51,12 @@ export default {
     * @password for password value
     */
     verifyForm(firstname, lastname, email, password){
+      let regex = new RegExp(/^(?=.*\d{2,})(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,100}$/gm)
       if(!firstname || !lastname || !email || !password) { return alert("Tous les champs ne sont pas rempli.") }
       if(firstname.length > 50 ){ return alert('Le prénom ne doit pas dépasser les 50 caractères.')}
       if(lastname.length > 50 ){ return alert('Le nom de famille ne doit pas dépasser les 50 caractères.')}
       if(email.length > 100 ){ return alert("L'adresse email ne doit pas dépasser les 100 caractères.")}
-      if( password.length < 8 || password.length > 100 ){ return alert( 'Le mot de passe ne doit pas dépasser les 100 caractères, et avoir au minimum 8 caractère, 1 majuscule, 1 minuscule, et 2 chiffres.' )}
+      if( !regex.test(password) ){ return alert( 'Le mot de passe ne doit pas dépasser les 100 caractères, et avoir au minimum 8 caractère, 1 majuscule, 1 minuscule, et 2 chiffres.' )}
       this.formIsClear = true ;
     }
   }
