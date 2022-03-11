@@ -47,15 +47,16 @@ export default {
     visitor_id: Number,
     visitor_role: Number,
     text: String,
-    creator_id: Number,
-    creator_name: String,
-    creator_avatar: String,
+    creator: Object,
     comment_date: String
   },
   data(){
     return {
       visitorId: "",
       visitorRole: "",
+      creator_id: "",
+      creator_name: "",
+      creator_avatar: "",
       commentDate: "",
       visitorCanUpdateOrDelete: false,
       deleteCommentQuestion: false,
@@ -68,6 +69,15 @@ export default {
     switchData(){
       this.visitorId = this.visitor_id;
       this.visitorRole = this.visitor_role;
+      if(this.creator == null){
+        this.creator_name = "Utilisateur supprimé";
+        this.creator_avatar = "http://localhost:3000/images/default-avatar.jpg";
+        this.creator_id = null ;
+      } else {
+        this.creator_name = this.creator.firstname + " " + this.creator.lastname;
+        this.creator_avatar = this.creator.avatar;
+        this.creator_id = this.creator.id ;
+      }
     },
     toLocalDate(){
       let date = new Date(this.comment_date)
@@ -78,7 +88,10 @@ export default {
         minute: 'numeric'
       })
     },
-    goToProfile(){ return this.$router.push({ path: '/profile/' + this.creator_id}) },
+    goToProfile(){ 
+      if( this.creator_id !== null ) { return this.$router.push({ path: '/profile/' + this.creator_id}) }
+      return alert("Cet utilisateur(rice) à été(e) supprimé(e).")
+      },
     verifyUser(){ if( this.visitorId == this.creator_id || this.visitorRole === 2 ) { return this.visitorCanUpdateOrDelete = true }},
     //====== UPDATE ======
     displayUpdateComment(){

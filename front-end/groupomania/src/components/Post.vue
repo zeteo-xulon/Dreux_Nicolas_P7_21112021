@@ -106,7 +106,10 @@ export default {
     },
     displayPostUpdate(){ !this.displayPostUpdateContainer ? this.displayPostUpdateContainer = true : this.displayPostUpdateContainer = false },
     displayComments(){ !this.showCommentBox ? this.showCommentBox = true : this.showCommentBox = false },
-    goToProfile(){ return this.$router.push({ path: '/profile/' + this.creator.id}) },
+    goToProfile(){ 
+      if( this.creator !== null ){ return this.$router.push({ path: '/profile/' + this.creator.id}) }
+      return alert("Cet utilisateur(rice) à été(e) supprimé(e).")
+      },
     displayDeleteContainer(){
       this.displayDeletePostQuestion = true;
       this.displayPostUpdateContainer = false;
@@ -180,10 +183,16 @@ export default {
       this.post_image = this.postImage;
       this.post_alt = this.postAlt;
       this.post_comments = this.comments;
-      this.postCreator = this.creator.firstname + " " + this.creator.lastname;
-      this.postCreatorAvatar = this.creator.avatar;
+      if(this.creator == null){
+        this.postCreator = "Utilisateur supprimé";
+        this.postCreatorAvatar = "http://localhost:3000/images/default-avatar.jpg";
+        this.postCreatorId = null ;
+      } else {
+        this.postCreator = this.creator.firstname + " " + this.creator.lastname;
+        this.postCreatorAvatar = this.creator.avatar;
+        this.postCreatorId = this.creator.id;
+      }
       this.toLocalDate();
-      this.postCreatorId =this.creator.id;
       this.visitor_id = this.visitorId;
       this.visitor_role = this.visitorRole;
     }

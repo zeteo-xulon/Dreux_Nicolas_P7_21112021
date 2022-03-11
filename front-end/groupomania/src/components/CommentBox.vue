@@ -6,9 +6,7 @@
     :visitor_id="visitor_id" 
     :visitor_role="visitor_role"
     :text="comment.text"
-    :creator_id="comment.user.id"
-    :creator_name="comment.user.firstname + ' ' + comment.user.lastname"
-    :creator_avatar="comment.user.avatar"
+    :creator="comment.user"
     :comment_date="comment.updatedAt"
     :comment_id="comment.id"
     :key="comment.id" />
@@ -70,9 +68,7 @@ export default {
   },
   watch: {
     refreshComponent(newValue, oldValue){
-      if(newValue > oldValue){
-        return this.getComments()
-      }
+      if(newValue > oldValue){ return this.getComments() }
     }
   },
   beforeMount(){

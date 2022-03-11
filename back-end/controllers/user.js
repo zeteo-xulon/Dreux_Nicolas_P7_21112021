@@ -128,7 +128,7 @@ exports.updatePassword = (req, res, next) => {
 	if(req.body.newPasswordFirstValue !== req.body.newPasswordSecondValue) { return res.status(400).json({ error: "Les mots de passe ne sont pas identique." }) };
 	let passwordIsClear = passwordSchema.validate(req.body.newPasswordSecondValue);
 	if(!passwordIsClear) { return res.status(400).json({ error: "Le mot de passe est incorrect, il doit contenir au moins 8 caractère, au moins 1 majuscule, 1 minuscule et 2 chiffres." })};
-	User.findOne({ where: { id: req.params.id }})
+	User.findOne({ where: { id: req.token }})
 	.then((e) => {
 		let foundUser = e.dataValues;
 		if( req.params.id != req.token && req.role !== 2 ) { return res.status(400).json({ message: "L'utilisateur n'as pas les droit requis." })}
